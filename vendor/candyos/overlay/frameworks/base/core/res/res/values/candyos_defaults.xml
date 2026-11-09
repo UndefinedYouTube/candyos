@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CandyOS P39.1: KitKat-style 3-button navigation as the system DEFAULT.
+
+     This file is HAND-MAINTAINED (not generated): the wallpaper generator
+     (scripts/candyos-gen-wallpapers.py) regenerates only the res/drawable*
+     buckets under this overlay and leaves everything else alone.
+
+     0 = back/home/recents buttons (the 4.4 donor navbar, styled by the
+     frameworks/base P9/P11 patches). A DEFAULT, not a lock: the CandyOS
+     Experience wizard step and menu screen switch modes by enabling the
+     com.android.internal.systemui.navbar.* mode overlays at runtime
+     (IOverlayManager.setEnabledExclusiveInCategory, exactly what Settings
+     does), and a runtime-enabled mode overlay beats this static overlay.
+     The pin exists so a stock base that defaults to gesture nav (a device
+     overlay setting config_navBarInteractionMode=2) boots 3-button here. -->
+<resources>
+    <integer name="config_navBarInteractionMode">0</integer>
+</resources>

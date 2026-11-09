@@ -23,6 +23,9 @@
     <string name="setup_apps_title">Default apps</string>
     <string name="setup_apps_body">Deselect to remove an app. You can bring any of them back later.</string>
 
+    <string name="setup_nav_title">Navigation style</string>
+    <string name="setup_nav_body">How you move around the system. 3-button is the CandyOS default — back, home and recents, KitKat style.</string>
+
     <string name="setup_play_title">Google services</string>
     <string name="setup_play_body">Optional Play compatibility: microG services let apps that depend on Google Play services work, Aurora Store downloads apps from the Play Store. Leave both off if you don\u2019t need them \u2014 you can change this anytime in CandyOS Experience.</string>
 
@@ -40,6 +43,13 @@
     <string name="play_microg_label">microG services (Play services + Play Store stub)</string>
     <string name="play_aurora_label">Aurora Store (Play Store client)</string>
     <string name="play_hint">microG needs its battery-optimization exemption lifted after enabling (its own settings screen links there), and a reboot gives push notifications a clean start.</string>
+
+    <!-- ===== Navigation mode (P39.1: 3-button default, wizard + menu) ===== -->
+    <string name="nav_title">Navigation</string>
+    <string name="nav_body">Pick the system navigation style. Applies immediately; you can change it anytime here or in Settings.</string>
+    <string name="nav_mode_3button">3-button (back, home, recents)</string>
+    <string name="nav_mode_2button">2-button (back, home + swipe-up recents)</string>
+    <string name="nav_mode_gesture">Gestures (swipe navigation)</string>
 
     <!-- ===== About ===== -->
     <string name="about_title">About CandyOS</string>

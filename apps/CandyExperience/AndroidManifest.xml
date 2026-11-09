@@ -4,6 +4,11 @@
 
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
+    <!-- Navigation mode switching (P39.1): enabling the
+         com.android.internal.systemui.navbar.* mode overlays, exactly what
+         the Settings "System navigation" screen does. signature|privileged:
+         the whitelist entry below declares it. -->
+    <uses-permission android:name="android.permission.CHANGE_OVERLAY_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- API 34 package visibility: the apps list below enumerates other
          packages, which the default filtering hides entirely (that is why
@@ -86,6 +91,11 @@
         <activity
             android:name=".UpdatesActivity"
             android:label="@string/updates_title"
+            android:exported="false" />
+
+        <activity
+            android:name=".NavigationActivity"
+            android:label="@string/nav_title"
             android:exported="false" />
 
         <activity

@@ -18,6 +18,7 @@ class MenuActivity : Activity() {
 
     private val entries = listOf(
         Entry("About", AboutActivity::class.java),
+        Entry("Navigation", NavigationActivity::class.java),
         Entry("Google services", PlayServicesActivity::class.java),
         Entry("Updates", UpdatesActivity::class.java),
         Entry("Testing", TestingActivity::class.java),

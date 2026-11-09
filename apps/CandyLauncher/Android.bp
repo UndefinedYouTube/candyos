@@ -61,14 +61,18 @@ android_library {
     sdk_version: "current",
 }
 
-// KitKat UI Project: Launcher3 also provides its aconfig flag library
+// KitKat UI Project: stock Launcher3 also provided its aconfig flag library
 // (com_android_launcher3_flags_lib), which frameworks/base
 // (services/core, WindowManager/Shell, iconloaderlib) links wholesale.
-// No CandyOS-tree production code references the flag classes, so an
-// empty library satisfies soong dependency resolution the same way as
-// the TAPL stub above.
+// CandyLauncher is a prebuilt with no aconfig sources, so the module is
+// filled with a hand-rolled com.android.launcher3.Flags class (see
+// src/com/android/launcher3/Flags.java) exposing exactly the flags the
+// in-tree consumers read, pinned to the legacy pre-flag defaults.
 java_library {
     name: "com_android_launcher3_flags_lib",
-    srcs: [],
+    srcs: [
+        "src/**/*.java",
+        "src/**/*.kt",
+    ],
     sdk_version: "current",
 }

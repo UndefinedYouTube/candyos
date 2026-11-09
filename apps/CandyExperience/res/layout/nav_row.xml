@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CandyOS Experience: a navigation-mode row (the KitKat Settings radio
+     pattern, like app_row but with a radio on the end - one row is one
+     mode, the container keeps the choice exclusive). The label takes
+     ?android:textColorPrimary so it follows whichever theme inflates it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/nav_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <RadioButton
+        android:id="@+id/nav_radio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:clickable="false"
+        android:focusable="false" />
+</LinearLayout>

@@ -86,9 +86,14 @@ def collect():
 
 
 def clean_generated():
-    """Remove exactly the files this script owns, repo-side."""
-    if os.path.isdir(OVERLAY_RES):
-        shutil.rmtree(os.path.join(REPO, "vendor", "candyos", "overlay"))
+    """Remove exactly the files this script owns, repo-side.
+
+    The overlay's res/drawable* wallpaper buckets are regenerated below;
+    everything else under vendor/candyos/overlay stays - the values/
+    defaults are hand-maintained (see vendor/candyos/README.md, P39.1).
+    """
+    for bucket in DEFAULT_BUCKETS:
+        shutil.rmtree(os.path.join(OVERLAY_RES, bucket), ignore_errors=True)
     if os.path.isdir(APP_WALLPAPERS_DIR):
         for f in os.listdir(APP_WALLPAPERS_DIR):
             if f.startswith("candyos_wp_"):

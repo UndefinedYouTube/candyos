@@ -181,6 +181,90 @@ object PlayConfig {
     }
 }
 
+/**
+ * The system navigation mode (P39.1) — the OTE wizard's nav-style step and
+ * the Experience menu "Navigation" screen share it.
+ *
+ * The system default is 3-button (pinned by the vendor/candyos overlay:
+ * config_navBarInteractionMode = 0), and the switches here are DEFAULTS,
+ * not locks: picking a mode enables the matching
+ * com.android.internal.systemui.navbar.* runtime overlay
+ * (IOverlayManager.setEnabledExclusiveInCategory, exactly what the
+ * Settings "System navigation" screen does), which beats the static
+ * overlay. SystemUI keeps Settings.Secure.NAVIGATION_MODE in sync with
+ * the resolved resource, so that setting is the readable current state.
+ */
+object NavConfig {
+    const val MODE_3BUTTON = 0
+    const val MODE_2BUTTON = 1
+    const val MODE_GESTURAL = 2
+
+    // WindowManagerPolicyConstants.NAV_BAR_MODE_*_OVERLAY
+    private val MODE_OVERLAYS = mapOf(
+        MODE_3BUTTON to "com.android.internal.systemui.navbar.threebutton",
+        MODE_2BUTTON to "com.android.internal.systemui.navbar.twobutton",
+        MODE_GESTURAL to "com.android.internal.systemui.navbar.gestural",
+    )
+
+    /** The three pickable modes, wizard order (3-button first: it is the default). */
+    val MODES = listOf(MODE_3BUTTON, MODE_2BUTTON, MODE_GESTURAL)
+
+    fun label(context: Context, mode: Int): CharSequence = when (mode) {
+        MODE_2BUTTON -> context.getString(R.string.nav_mode_2button)
+        MODE_GESTURAL -> context.getString(R.string.nav_mode_gesture)
+        else -> context.getString(R.string.nav_mode_3button)
+    }
+
+    /** The currently active mode: NAVIGATION_MODE, or 3-button if unset. */
+    fun current(context: Context): Int =
+        Settings.Secure.getString(
+            context.contentResolver, Settings.Secure.NAVIGATION_MODE)?.toIntOrNull()
+            ?: MODE_3BUTTON
+
+    /** Enable the picked mode's overlay (exclusive in its category). */
+    fun apply(context: Context, mode: Int) {
+        val overlayPackage = MODE_OVERLAYS[mode] ?: return
+        val om = context.getSystemService(android.content.om.OverlayManager::class.java)
+            ?: return
+        om.setEnabledExclusiveInCategory(
+            overlayPackage, android.os.Process.myUserHandle())
+    }
+
+    /**
+     * Radio rows for a mode picker: returns row mode -> RadioButton, with
+     * the current mode checked. The container handles exclusivity the same
+     * way the 4.4 Settings radio lists do (one row = one mode).
+     */
+    fun addRows(
+        context: Context,
+        container: LinearLayout,
+        selected: Int,
+        onPick: ((Int) -> Unit)? = null,
+    ): Map<Int, android.widget.RadioButton> {
+        container.removeAllViews()
+        val rows = mutableMapOf<Int, android.widget.RadioButton>()
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)
+            as android.view.LayoutInflater
+        for (mode in MODES) {
+            val row = inflater.inflate(R.layout.nav_row, container, false) as LinearLayout
+            val labelView = row.requireViewById<android.widget.TextView>(R.id.nav_label)
+            val radio = row.requireViewById<android.widget.RadioButton>(R.id.nav_radio)
+            labelView.text = label(context, mode)
+            radio.isChecked = mode == selected
+            // The whole row picks, KitKat Settings style; checking one
+            // mode unchecks the others.
+            row.setOnClickListener {
+                for ((_, other) in rows) other.isChecked = false
+                radio.isChecked = true
+                onPick?.invoke(mode)
+            }
+            container.addView(row)
+            rows[mode] = radio
+        }
+        return rows
+    }
+}
+
 object SysInfo {
     fun candyVersion(): String =
         SystemProperties.get("ro.lineage.version")

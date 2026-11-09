@@ -24,14 +24,23 @@ class SetupActivity : Activity() {
     private lateinit var dots: LinearLayout
     private var appRows: Map<String, android.widget.CheckBox> = emptyMap()
     private var playRows: Map<String, android.widget.CheckBox> = emptyMap()
+    private var navMode = NavConfig.MODE_3BUTTON
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // If the device is already provisioned, this activity was reached by
-        // a stale HOME resolution: the wizard is done, the menu is the app.
-        if (Settings.Global.getInt(
-                contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1) {
+        // The wizard runs exactly once per data image, tracked by a private
+        // flag rather than DEVICE_PROVISIONED: the emulator products ship
+        // com.android.sdksetup (device/generic/goldfish), whose HOME
+        // activity auto-provisions the device at boot before this wizard
+        // can run - on a fresh boot it has already set DEVICE_PROVISIONED,
+        // so gating on it would bounce straight to the menu and the OTE
+        // would never show. The flag is written in finishSetup; if this
+        // activity is reached with the flag set, it is a stale HOME
+        // resolution (or a manual component re-enable): the wizard is
+        // done, the menu is the app.
+        if (getSharedPreferences(PREFS_SETUP, MODE_PRIVATE)
+                .getBoolean(KEY_SETUP_COMPLETE, false)) {
             startActivity(Intent(this, MenuActivity::class.java))
             finish()
             return
@@ -77,6 +86,8 @@ class SetupActivity : Activity() {
         buildDots()
         appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
         playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
+        navMode = NavConfig.current(this)
+        buildNavRows()
         updateChrome()
     }
 
@@ -96,6 +107,9 @@ class SetupActivity : Activity() {
         appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
         if (::flipper.isInitialized) {
             playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
+            // The nav radio rows keep their in-progress selection across
+            // pauses (Settings could have changed the mode meanwhile, but
+            // the wizard's pick wins at finish).
             updateNetworkStatus()
         }
     }
@@ -136,7 +150,14 @@ class SetupActivity : Activity() {
         when (step) {
             STEP_NETWORK -> updateNetworkStatus()
             STEP_APPS -> appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
+            STEP_NAV -> buildNavRows()
             STEP_PLAY -> playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
+        }
+    }
+
+    private fun buildNavRows() {
+        NavConfig.addRows(this, requireViewById(R.id.nav_rows), navMode) { mode ->
+            navMode = mode
         }
     }
 
@@ -157,8 +178,16 @@ class SetupActivity : Activity() {
     private fun finishSetup() {
         AppsConfig.applySelections(this, appRows)
         PlayConfig.applySelections(this, playRows)
+        NavConfig.apply(this, navMode)
         Settings.Global.putInt(contentResolver, Settings.Global.DEVICE_PROVISIONED, 1)
         Settings.Secure.putInt(contentResolver, Settings.Secure.USER_SETUP_COMPLETE, 1)
+
+        // Pin the once-per-data-image wizard flag synchronously (commit, not
+        // apply): nothing else may observe the wizard as unfinished after
+        // this point, even if the process is killed right after.
+        getSharedPreferences(PREFS_SETUP, MODE_PRIVATE).edit()
+            .putBoolean(KEY_SETUP_COMPLETE, true)
+            .commit()
 
         // Retire the wizard: with DEVICE_PROVISIONED set this component must
         // stop answering HOME, or the system resolves Home straight back into
@@ -176,9 +205,12 @@ class SetupActivity : Activity() {
     }
 
     companion object {
+        private const val PREFS_SETUP = "candy_setup"
+        private const val KEY_SETUP_COMPLETE = "setup_complete"
         private const val STEP_NETWORK = 1
         private const val STEP_APPS = 2
-        private const val STEP_PLAY = 3
+        private const val STEP_NAV = 3
+        private const val STEP_PLAY = 4
         private const val DOT_ALPHA_ACTIVE = 1f
         private const val DOT_ALPHA_INACTIVE = 0.3f
     }
