@@ -36,7 +36,7 @@ git clone https://github.com/UndefinedYouTube/candyos ~/android/candyos
 cd ~/android/lineage
 source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-aosp_current-userdebug
-m -j8
+make
 ~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage
 ```
 
