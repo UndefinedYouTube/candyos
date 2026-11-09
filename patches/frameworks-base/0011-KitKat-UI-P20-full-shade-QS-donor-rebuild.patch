@@ -1,58 +1,48 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Thu, 22 Oct 2026 09:08:58 -0500
-Subject: [PATCH 12/20] KitKat UI P20: full shade/QS donor rebuild
+Date: Sun, 8 Nov 2026 16:18:53 -0600
+Subject: [PATCH 11/19] KitKat UI P20: full-shade QS donor rebuild
 
-- 20.2a NotificationShadeDepthController.shouldApplyShadeBlur -> false
-  (shade blur/zoom off; keyguard pipeline untouched) - risk-ruled
-  approximation per user decision.
-- 20.2c NotificationsQSContainerController: shade_bottom_handle rides
-  the expansion edge (donor NotificationPanelView.draw semantics) via
-  ShadeExpansionStateManager listener.
-- 20.3 FooterView.setFooterLabelVisible: normal path keeps BOTH
-  buttons hidden (legacy branch re-showed them every layout pass,
-  defeating the 18.3 ViewModel hide) - donor had no footer buttons.
-- 20.4 combined_qs_header: donor 50dp ic_notify_settings +
-  ic_notify_button_bg on both header buttons (art ported per density).
-- 20.6 qs_tile_margin_* 8dp -> 4dp (donor quick_settings_cell_gap).
-- 20.7 shadeActive/shadeInactive #2d2d2d -> #ff161616 (donor
-  qs_tile_background flat color), ripple color -> #ff212121 donor
-  press, square tile corners.
-- 20.8 QSPanel.setBrightnessView: inline slider NOT attached (tile +
-  dialog per donor) - plumbing intact, one-line revert.
-- 20.9 TextAppearance.StatusBar.Expanded.Clock/.Date -> donor values
-  (32dp light white / 12dp #cccccc caps); header clock/date pill.
-- 20.10 quick_settings_tiles_default -> donor set+order (user,
-  brightness, settings, wifi, cell, battery, bt, location, rotation);
-  KitKat{Brightness,Settings,User}Tile + KitKatQSTilesModule added.
-- 20.1 (LatinIME fork) functionalTextColor -> white: ?123/ABC layout
-  keys were painting transparent (blank toggle keys).
-Verified on emulator: donor 3-col grid with 4dp gaps + #161616 flat
-tiles on gradient page, footer buttons gone, toggle keys render,
-zero FATALs.
+- donor QS tile set/order (user, brightness, settings, wifi, cell,
+  battery, bt, location, rotation) via quick_settings_tiles_default,
+  with the donor KitKat QS tiles (KitKatBrightnessTile launches the
+  donor brightness dialog, KitKatSettingsTile, KitKatUserTile) wired
+  through KitKatQSTilesModule (ReferenceSystemUIModule include)
+- flat #161616/#212121-press square tiles (shadeActive/Inactive), 4dp
+  donor tile gaps, donor Expanded.Clock/.Date header typography and
+  the wrap-content clock+date row
+- donor strings (Brightness/Settings/Me tile labels)
+- no shade blur in the unlocked shade (donor shade was opaque)
+- shade bottom-handle expansion listener wired through
+  ShadeExpansionStateManager (which regains removeExpansionListener,
+  lost upstream in lineage-24)
+
+los-24 port notes: QSPanel.java and the qs_tile_background drawables
+were dropped upstream (the QS panel moved to Compose); the P18 QS
+footer-hide (P18.4 QSPanel patch) is moot upstream. The footer buttons
+hide now flows through the split settings/history buttons.
+
+Change-Id: Ib1b8c7e2d1f3a4b5c6d7e8f90a1b2c3d4e5f6a7c
 ---
  .../ic_notify_settings_normal.png             | Bin 0 -> 1821 bytes
  .../ic_notify_settings_normal.png             | Bin 0 -> 1251 bytes
  .../ic_notify_settings_normal.png             | Bin 0 -> 2568 bytes
  .../ic_notify_settings_normal.png             | Bin 0 -> 3247 bytes
  .../res/drawable/ic_notify_settings.xml       |  23 ++++
- .../res/drawable/qs_tile_background.xml       |   3 +-
- .../res/drawable/qs_tile_background_shape.xml |   3 +-
- .../res/layout/combined_qs_header.xml         |  38 ++++---
+ .../res/layout/combined_qs_header.xml         |  34 +++---
  packages/SystemUI/res/values/config.xml       |  10 +-
  packages/SystemUI/res/values/dimens.xml       |   3 +-
  packages/SystemUI/res/values/strings.xml      |   4 +
  packages/SystemUI/res/values/styles.xml       |  22 ++--
  .../dagger/ReferenceSystemUIModule.java       |   2 +
- .../src/com/android/systemui/qs/QSPanel.java  |  14 ++-
- .../qs/tiles/KitKatBrightnessTile.java        |  86 +++++++++++++++
+ .../qs/tiles/KitKatBrightnessTile.java        |  86 ++++++++++++++
  .../systemui/qs/tiles/KitKatQSTilesModule.kt  |  33 ++++++
- .../systemui/qs/tiles/KitKatSettingsTile.java |  79 ++++++++++++++
- .../systemui/qs/tiles/KitKatUserTile.java     | 103 ++++++++++++++++++
- .../NotificationsQSContainerController.kt     |  25 +++++
+ .../systemui/qs/tiles/KitKatSettingsTile.java |  79 +++++++++++++
+ .../systemui/qs/tiles/KitKatUserTile.java     | 105 ++++++++++++++++++
+ .../NotificationsQSContainerController.kt     |  22 ++++
+ .../shade/ShadeExpansionStateManager.kt       |  13 +++
  .../NotificationShadeDepthController.kt       |   7 +-
- .../footer/ui/view/FooterView.java            |  10 +-
- 21 files changed, 428 insertions(+), 37 deletions(-)
+ 18 files changed, 416 insertions(+), 27 deletions(-)
  create mode 100644 packages/SystemUI/res/drawable-hdpi/ic_notify_settings_normal.png
  create mode 100644 packages/SystemUI/res/drawable-mdpi/ic_notify_settings_normal.png
  create mode 100644 packages/SystemUI/res/drawable-xhdpi/ic_notify_settings_normal.png
@@ -295,47 +285,17 @@ index 000000000000..9303ca4c3d60
 +         android:drawable="@drawable/ic_notify_settings_normal" />
 +</selector>
 +
-diff --git a/packages/SystemUI/res/drawable/qs_tile_background.xml b/packages/SystemUI/res/drawable/qs_tile_background.xml
-index ef3c61bda15a..9a3586e7b304 100644
---- a/packages/SystemUI/res/drawable/qs_tile_background.xml
-+++ b/packages/SystemUI/res/drawable/qs_tile_background.xml
-@@ -14,8 +14,9 @@
-   ~ See the License for the specific language governing permissions and
-   ~ limitations under the License.
-   -->
-+<!-- KitKat UI P20.7: donor press = flat #212121 lighten (no ripple). -->
- <ripple xmlns:android="http://schemas.android.com/apk/res/android"
--    android:color="@color/qs_tile_ripple_color">
-+    android:color="#ff212121">
-     <item android:id="@android:id/mask"
-         android:drawable="@drawable/qs_tile_background_shape"
-         />
-diff --git a/packages/SystemUI/res/drawable/qs_tile_background_shape.xml b/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
-index f6b68347124e..44ef3f3dbe1e 100644
---- a/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
-+++ b/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
-@@ -16,6 +16,7 @@
-   -->
- 
- <shape xmlns:android="http://schemas.android.com/apk/res/android">
--    <corners android:radius="@dimen/qs_corner_radius" />
-+    <!-- KitKat UI P20.7: donor tiles were square. -->
-+    <corners android:radius="0dp" />
-     <solid android:color="#FFFFFF" />
- </shape>
-\ No newline at end of file
 diff --git a/packages/SystemUI/res/layout/combined_qs_header.xml b/packages/SystemUI/res/layout/combined_qs_header.xml
-index 554f00dbb6a3..1d7dfd478b09 100644
+index 5b7d15e0a31f..b8ca29dac81c 100644
 --- a/packages/SystemUI/res/layout/combined_qs_header.xml
 +++ b/packages/SystemUI/res/layout/combined_qs_header.xml
-@@ -90,31 +90,34 @@ frame when animating QS <-> QQS transition
+@@ -90,31 +90,30 @@ frame when animating QS <-> QQS transition
          android:contentDescription="@string/shade_header_user_avatar_description"
          android:src="@drawable/kitkat_qs_user_avatar" />
  
-+    <!-- KitKat UI P20.9: donor header clock+date - the 4.4
-+         status_bar_expanded_header put clock and date inside a
-+         non-pressable ic_notify_button_bg pill (enabled=false) with the
-+         donor Expanded.Clock/.Date typography. -->
++<!-- KitKat UI P20.9: donor header clock+date - the 4.4
++         status_bar_expanded_header put clock and date side by side with
++         the donor Expanded.Clock/.Date typography. -->
      <com.android.systemui.statusbar.policy.Clock
          android:id="@+id/clock"
          android:layout_width="wrap_content"
@@ -345,12 +305,9 @@ index 554f00dbb6a3..1d7dfd478b09 100644
 -        android:paddingStart="@dimen/status_bar_left_clock_starting_padding"
 -        android:paddingEnd="@dimen/status_bar_left_clock_end_padding"
 +        android:paddingStart="8dp"
-+        android:paddingEnd="8dp"
-+        android:background="@drawable/ic_notify_button_bg"
-+        android:enabled="false"
          android:singleLine="true"
          android:textDirection="locale"
--        android:textAppearance="@style/TextAppearance.QS.Status"
+-        android:textAppearance="@style/TextAppearance.QS.Status.Clock"
 -        android:transformPivotX="0dp"
 -        android:transformPivotY="24dp"
 -        android:scaleX="1"
@@ -373,7 +330,7 @@ index 554f00dbb6a3..1d7dfd478b09 100644
          app:longDatePattern="@string/abbrev_wday_month_day_no_year_alarm"
          app:shortDatePattern="@string/abbrev_month_day_no_year"
      />
-@@ -188,8 +191,8 @@ frame when animating QS <-> QQS transition
+@@ -182,8 +181,8 @@ frame when animating QS <-> QQS transition
           footer button used. -->
      <ImageButton
          android:id="@+id/shade_header_clear_all_button"
@@ -384,7 +341,7 @@ index 554f00dbb6a3..1d7dfd478b09 100644
          android:src="@drawable/ic_notify_clear"
          android:scaleType="center"
          android:background="@drawable/ic_notify_button_bg"
-@@ -202,13 +205,16 @@ frame when animating QS <-> QQS transition
+@@ -196,13 +195,16 @@ frame when animating QS <-> QQS transition
            start of the privacy chip so the two never overlap; carried into the
            qqs_header/qs_header/large_screen_shade_header constraint sets so the
            MotionLayout transitions leave it in place. -->
@@ -406,14 +363,14 @@ index 554f00dbb6a3..1d7dfd478b09 100644
          app:layout_constraintEnd_toStartOf="@id/privacy_container"
          app:layout_constraintTop_toTopOf="parent" />
 diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
-index d96391191f7f..22af5a25f566 100644
+index 2599cf13d796..44ef28b2e7a7 100644
 --- a/packages/SystemUI/res/values/config.xml
 +++ b/packages/SystemUI/res/values/config.xml
-@@ -97,8 +97,16 @@
+@@ -81,8 +81,16 @@
      <!-- The number of columns that the top level tiles span in the QuickSettings -->
  
-     <!-- The default tiles to display in QuickSettings -->
-+    <!-- KitKat UI P20.10: the DONOR 4.4 phone QS tile set + order
+     <!-- The default tiles to display in QuickSettings-->
++<!-- KitKat UI P20.10: the DONOR 4.4 phone QS tile set + order
 +         (QuickSettings.setupQuickSettings: user, brightness, settings,
 +         wifi, cell/rssi, battery, bluetooth, location, rotation).
 +         20.8: brightness opens the donor quick_settings_brightness_
@@ -422,31 +379,31 @@ index d96391191f7f..22af5a25f566 100644
 +         4dp gaps, 3 columns. Modern-only tiles dropped from the grid
 +         per user ruling (toggles stay reachable in Settings). -->
      <string name="quick_settings_tiles_default" translatable="false">
--        internet,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,custom(com.android.permissioncontroller/.permission.service.v33.SafetyCenterQsTileService)
+-        internet,bt,dnd,cast,flashlight,airplane,rotation,wallet,alarm,controls,screenrecord,battery
 +        user,brightness,settings,wifi,cell,battery,bt,location,rotation
      </string>
  
-     <!-- The class path of the Safety Quick Settings Tile -->
+     <!-- The default tiles to display in QuickSettings after the internet tile split-->
 diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
-index 529299b7ead9..12f31a8f46cc 100644
+index 1eb52e45c5cb..e1e7012aae3e 100644
 --- a/packages/SystemUI/res/values/dimens.xml
 +++ b/packages/SystemUI/res/values/dimens.xml
-@@ -662,7 +662,8 @@
+@@ -718,7 +718,8 @@
+ 
+     <!-- KitKat UI Project: square QS chrome (was 28dp pills) -->
      <dimen name="qs_corner_radius">2dp</dimen>
-     <!-- KitKat UI Project (P10): 4.4 QS cell height (donor quick_settings_cell_height) -->
-     <dimen name="qs_tile_height">110dp</dimen>
 -    <dimen name="qs_tile_margin_horizontal">8dp</dimen>
 +    <!-- KitKat UI P20.6: donor quick_settings_cell_gap = 4dp. -->
 +    <dimen name="qs_tile_margin_horizontal">4dp</dimen>
      <dimen name="qs_tile_margin_vertical">@dimen/qs_tile_margin_horizontal</dimen>
-     <dimen name="qs_tile_margin_top_bottom">4dp</dimen>
      <dimen name="qs_brightness_margin_top">8dp</dimen>
+     <dimen name="brightness_dialog_expanded_width">364dp</dimen>
 diff --git a/packages/SystemUI/res/values/strings.xml b/packages/SystemUI/res/values/strings.xml
-index 7c5bd3ba74fe..2aace12aed74 100644
+index c376247087b3..ea0d330ca3c6 100644
 --- a/packages/SystemUI/res/values/strings.xml
 +++ b/packages/SystemUI/res/values/strings.xml
-@@ -754,6 +754,10 @@
-     <string name="quick_settings_cast_no_network">No Wi\u2011Fi or Ethernet connection</string>
+@@ -1178,6 +1178,10 @@
+     <string name="quick_settings_audio_effects_section_title">Effects</string>
      <!-- QuickSettings: Brightness dialog title [CHAR LIMIT=NONE] -->
      <string name="quick_settings_brightness_dialog_title">Brightness</string>
 +    <!-- KitKat UI P20.8/P20.10: donor 4.4 QS tile labels. -->
@@ -457,20 +414,20 @@ index 7c5bd3ba74fe..2aace12aed74 100644
      <string name="quick_settings_inversion_label">Color inversion</string>
      <!-- QuickSettings: Label for the toggle that controls whether display color correction is enabled. [CHAR LIMIT=NONE] -->
 diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
-index 71f9eaaf86e5..a956366e6d3f 100644
+index 03a87d358d92..b96c3759ba43 100644
 --- a/packages/SystemUI/res/values/styles.xml
 +++ b/packages/SystemUI/res/values/styles.xml
 @@ -33,18 +33,21 @@
-         <item name="android:textColor">?android:attr/textColorTertiary</item>
+         <item name="android:textColor">@color/materialColorOutline</item>
      </style>
  
-+    <!-- KitKat UI P20.9: donor TextAppearance.StatusBar.Expanded.Clock/.Date
++<!-- KitKat UI P20.9: donor TextAppearance.StatusBar.Expanded.Clock
 +         (status_bar_expanded_header.xml values) - 32dp sans-serif-light
-+         white clock, 12dp #cccccc all-caps date. -->
++         white clock. -->
      <style name="TextAppearance.StatusBar.Expanded.Clock">
 -        <item name="android:textSize">@dimen/qs_time_expanded_size</item>
 -        <item name="android:fontFamily">@*android:string/config_headlineFontFamilyMedium</item>
--        <item name="android:textColor">?android:attr/textColorPrimary</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
 +        <item name="android:textSize">32dp</item>
 +        <item name="android:fontFamily">sans-serif-light</item>
          <item name="android:textStyle">normal</item>
@@ -481,19 +438,19 @@ index 71f9eaaf86e5..a956366e6d3f 100644
 -        <item name="android:textSize">@dimen/qs_time_expanded_size</item>
 +        <item name="android:textSize">12dp</item>
          <item name="android:textStyle">normal</item>
--        <item name="android:textColor">?android:attr/textColorPrimary</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
 -        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
 +        <item name="android:textColor">#cccccc</item>
 +        <item name="android:textAllCaps">true</item>
      </style>
  
      <style name="TextAppearance.StatusBar.Expanded.AboveDateTime">
-@@ -451,10 +454,13 @@
+@@ -541,10 +544,13 @@
               states (no monet primary90 light-fill for active), and the
               active/inactive distinction moves to white vs gray text and
               icon tint, as on the 4.4 quick settings panel. -->
 -        <item name="shadeActive">#ff2d2d2d</item>
-+        <!-- KitKat UI P20.7: donor qs_tile_background.xml - flat color
++<!-- KitKat UI P20.7: donor qs_tile_background.xml - flat color
 +             selector #161616 at rest / #212121 pressed (not #ff2d2d2d).
 +             Active/inactive distinction stays text/icon tint (4.4). -->
 +        <item name="shadeActive">#ff161616</item>
@@ -503,61 +460,30 @@ index 71f9eaaf86e5..a956366e6d3f 100644
 +        <item name="shadeInactive">#ff161616</item>
          <item name="onShadeInactive">#ffb3b3b3</item>
          <item name="onShadeInactiveVariant">#ff808080</item>
-         <item name="shadeDisabled">@color/shade_disabled</item>
+         <item name="shadeDisabled">@color/customColorShadeDisabled</item>
 diff --git a/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java b/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
-index a4011fd7718c..be504d56b690 100644
+index 9b2c98685f8c..67f05b6f2fbe 100644
 --- a/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
 +++ b/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
-@@ -26,6 +26,7 @@ import com.android.keyguard.KeyguardViewController;
- import com.android.systemui.ScreenDecorationsModule;
- import com.android.systemui.accessibility.SystemActionsModule;
+@@ -31,6 +31,7 @@ import com.android.systemui.accessibility.SystemActionsModule;
+ import com.android.systemui.accessibility.data.repository.AccessibilityRepositoryModule;
+ import com.android.systemui.actioncorner.ActionCornerModule;
  import com.android.systemui.battery.BatterySaverModule;
 +import com.android.systemui.qs.tiles.KitKatQSTilesModule;
- import com.android.systemui.display.ui.viewmodel.ConnectingDisplayViewModel;
- import com.android.systemui.dock.DockManager;
- import com.android.systemui.dock.DockManagerImpl;
-@@ -96,6 +97,7 @@ import javax.inject.Named;
- @Module(includes = {
+ import com.android.systemui.clipboardoverlay.dagger.ClipboardOverlayOverrideModule;
+ import com.android.systemui.communal.posturing.dagger.PosturingModule;
+ import com.android.systemui.contextualcursor.ContextualCursorModule;
+@@ -140,6 +141,7 @@ import javax.inject.Provider;
+         AccessibilityRepositoryModule.class,
          AospPolicyModule.class,
          BatterySaverModule.class,
 +        KitKatQSTilesModule.class,
-         CollapsedStatusBarFragmentStartableModule.class,
+         CentralSurfacesModule.class,
+         ClipboardOverlayOverrideModule.class,
          ConnectingDisplayViewModel.StartableModule.class,
-         GestureModule.class,
-diff --git a/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java b/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
-index a321e6a4dac2..5ae8d1c941a4 100644
---- a/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
-+++ b/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
-@@ -221,18 +221,20 @@ public class QSPanel extends LinearLayout {
-      * Used to add the brightness slider after construction.
-      */
-     public void setBrightnessView(@NonNull View view) {
-+        // KitKat UI Project (P20.8): the donor phone QS had NO inline
-+        // brightness slider above the grid - brightness is a TILE that
-+        // opens the brightness dialog (KitKatBrightnessTile). Do not attach
-+        // the slider view to the panel; keep the reference plumbing intact
-+        // (QSPanelController/mirrors still function) so re-enabling is a
-+        // one-line revert.
-+        view.setVisibility(View.GONE);
-         if (mBrightnessView != null) {
-             removeView(mBrightnessView);
-             mChildrenLayoutTop.remove(mBrightnessView);
-             mMovableContentStartIndex--;
-         }
--        addView(view, 0);
--        mBrightnessView = view;
-+        mBrightnessView = null;
-         mAutoBrightnessView = view.findViewById(R.id.brightness_icon);
--
--        setBrightnessViewMargin();
--
--        mMovableContentStartIndex++;
-     }
- 
-     private void setBrightnessViewMargin() {
 diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
 new file mode 100644
-index 000000000000..4a4d9b275727
+index 000000000000..ae375eb62e67
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
 @@ -0,0 +1,86 @@
@@ -570,7 +496,7 @@ index 000000000000..4a4d9b275727
 +import android.service.quicksettings.Tile;
 +
 +import javax.inject.Inject;
-+import android.view.View;
++import com.android.systemui.animation.Expandable;
 +
 +import androidx.annotation.Nullable;
 +
@@ -624,7 +550,7 @@ index 000000000000..4a4d9b275727
 +    }
 +
 +    @Override
-+    protected void handleClick(@Nullable View view) {
++    protected void handleClick(@Nullable Expandable expandable) {
 +        // Donor behavior: open the brightness dialog.
 +        mActivityStarter.postStartActivityDismissingKeyguard(BRIGHTNESS_DIALOG_INTENT, 0);
 +    }
@@ -690,7 +616,7 @@ index 000000000000..0f08d65e6209
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
 new file mode 100644
-index 000000000000..b960353f0731
+index 000000000000..40d4ffc5cf90
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
 @@ -0,0 +1,79 @@
@@ -701,7 +627,7 @@ index 000000000000..b960353f0731
 +import android.os.Looper;
 +import android.provider.Settings;
 +import android.service.quicksettings.Tile;
-+import android.view.View;
++import com.android.systemui.animation.Expandable;
 +
 +import androidx.annotation.Nullable;
 +
@@ -750,7 +676,7 @@ index 000000000000..b960353f0731
 +    }
 +
 +    @Override
-+    protected void handleClick(@Nullable View view) {
++    protected void handleClick(@Nullable Expandable expandable) {
 +        mActivityStarter.postStartActivityDismissingKeyguard(
 +                new Intent(Settings.ACTION_SETTINGS), 0);
 +    }
@@ -776,10 +702,10 @@ index 000000000000..b960353f0731
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
 new file mode 100644
-index 000000000000..d1525e8dad9d
+index 000000000000..4dfb31e0d045
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,105 @@
 +package com.android.systemui.qs.tiles;
 +
 +import android.content.Intent;
@@ -790,7 +716,7 @@ index 000000000000..d1525e8dad9d
 +import android.os.Looper;
 +import android.provider.ContactsContract;
 +import android.service.quicksettings.Tile;
-+import android.view.View;
++import com.android.systemui.animation.Expandable;
 +
 +import androidx.annotation.Nullable;
 +
@@ -840,10 +766,12 @@ index 000000000000..d1525e8dad9d
 +    }
 +
 +    @Override
-+    protected void handleClick(@Nullable View view) {
++    protected void handleClick(@Nullable Expandable expandable) {
 +        // Donor single-user path: quick-contact card for the owner profile.
++        // los-24: handleClick lost its View anchor param (Expandable now);
++        // the QuickContact dialog only needs any anchor view.
 +        final Intent intent = ContactsContract.QuickContact.composeQuickContactsIntent(
-+                mContext, view != null ? view : new View(mContext),
++                mContext, new android.view.View(mContext),
 +                ContactsContract.Profile.CONTENT_URI,
 +                ContactsContract.QuickContact.MODE_LARGE, null);
 +        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -885,28 +813,18 @@ index 000000000000..d1525e8dad9d
 +}
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
-index 74151f94fe66..930baf1b4479 100644
+index 1c8e9884a5bd..8a3fc0b5cff9 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
-@@ -41,6 +41,9 @@ import com.android.systemui.plugins.statusbar.StatusBarStateController
- import com.android.systemui.recents.OverviewProxyService
- import com.android.systemui.recents.OverviewProxyService.OverviewProxyListener
- import com.android.systemui.res.R
-+import com.android.systemui.shade.ShadeExpansionChangeEvent
-+import com.android.systemui.shade.ShadeExpansionListener
-+import com.android.systemui.shade.ShadeExpansionStateManager
- import com.android.systemui.shade.carrier.ShadeCarrierTextController
- import com.android.systemui.shade.domain.interactor.ShadeInteractor
- import com.android.systemui.shared.system.QuickStepContract
-@@ -74,6 +77,7 @@ class NotificationsQSContainerController @Inject constructor(
-     private val largeScreenHeaderHelperLazy: Lazy<LargeScreenHeaderHelper>,
+@@ -72,6 +72,7 @@ constructor(
+     private val splitShadeStateController: SplitShadeStateController,
      private val carrierTextManagerBuilder: CarrierTextManager.Builder,
      private val statusBarStateController: StatusBarStateController,
 +    private val shadeExpansionStateManager: ShadeExpansionStateManager,
- ) : ViewController<NotificationsQuickSettingsContainer>(view), QSContainerController {
- 
-     // KitKat UI Project: carrier label at the bottom of the shade
-@@ -94,6 +98,25 @@ class NotificationsQSContainerController @Inject constructor(
+     private val shadeModeInteractor: ShadeModeInteractor,
+     private val largeScreenHeaderHelperLazy: Lazy<LargeScreenHeaderHelper>,
+     @Background private val backgroundScope: CoroutineScope,
+@@ -95,6 +96,25 @@ constructor(
              }
          }
  
@@ -932,27 +850,51 @@ index 74151f94fe66..930baf1b4479 100644
      private var splitShadeEnabled = false
      private var isQSDetailShowing = false
      private var isQSCustomizing = false
-@@ -167,6 +190,7 @@ class NotificationsQSContainerController @Inject constructor(
-         overviewProxyService.addCallback(taskbarVisibilityListener)
+@@ -186,6 +206,7 @@ constructor(
+         launcherProxyService.addCallback(taskbarVisibilityListener)
          statusBarStateController.addCallback(shadeBottomHandleStateListener)
          shadeBottomHandleStateListener.onStateChanged(statusBarStateController.getState())
 +        shadeExpansionStateManager.addExpansionListener(shadeBottomHandleExpansionListener)
          mView.setInsetsChangedListener(delayedInsetSetter)
          mView.setQSFragmentAttachedListener { qs: QS -> qs.setContainerController(this) }
          mView.setConfigurationChangedListener { updateResources() }
-@@ -176,6 +200,7 @@ class NotificationsQSContainerController @Inject constructor(
+@@ -195,6 +216,7 @@ constructor(
      override fun onViewDetached() {
-         overviewProxyService.removeCallback(taskbarVisibilityListener)
+         launcherProxyService.removeCallback(taskbarVisibilityListener)
          statusBarStateController.removeCallback(shadeBottomHandleStateListener)
 +        shadeExpansionStateManager.removeExpansionListener(shadeBottomHandleExpansionListener)
          mView.removeOnInsetsChangedListener()
          mView.removeQSFragmentAttachedListener()
          mView.setConfigurationChangedListener(null)
+diff --git a/packages/SystemUI/src/com/android/systemui/shade/ShadeExpansionStateManager.kt b/packages/SystemUI/src/com/android/systemui/shade/ShadeExpansionStateManager.kt
+index 9696a9c3ae0b..ca71f5d68b1f 100644
+--- a/packages/SystemUI/src/com/android/systemui/shade/ShadeExpansionStateManager.kt
++++ b/packages/SystemUI/src/com/android/systemui/shade/ShadeExpansionStateManager.kt
+@@ -55,6 +55,19 @@ class ShadeExpansionStateManager @Inject constructor() {
+         return ShadeExpansionChangeEvent(fraction, expanded, tracking)
+     }
+ 
++    /**
++     * Removes a listener previously added via [addExpansionListener].
++     *
++     * KitKat UI Project (P20): lineage-24 lost this counterpart to
++     * addExpansionListener; the shade bottom-handle controller
++     * (NotificationsQSContainerController) needs it to unregister on view
++     * detach.
++     */
++    @Deprecated("Use ShadeInteractor instead")
++    fun removeExpansionListener(listener: ShadeExpansionListener) {
++        expansionListeners.remove(listener)
++    }
++
+     /** Adds a listener that will be notified when the panel state has changed. */
+     @Deprecated("Use ShadeInteractor instead")
+     fun addStateListener(listener: ShadeStateListener) {
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
-index 5c45f3d1bbc8..ceba80b1e095 100644
+index 65c933463bfc..048f3e8cd12f 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
-@@ -458,7 +458,12 @@ class NotificationShadeDepthController @Inject constructor(
+@@ -715,7 +715,12 @@ constructor(
       */
      private fun shouldApplyShadeBlur(): Boolean {
          val state = statusBarStateController.state
@@ -963,30 +905,9 @@ index 5c45f3d1bbc8..ceba80b1e095 100644
 +        // unlocked SHADE state (the only state the donor shade existed in).
 +        // Keyguard/bouncer/AOD states keep the stock blur pipeline untouched.
 +        return false && (state == StatusBarState.SHADE || state == StatusBarState.SHADE_LOCKED) &&
-                 !keyguardStateController.isKeyguardFadingAway
+             !keyguardStateController.isKeyguardFadingAway
      }
  
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
-index bda5fae6a336..a82d32c11641 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
-@@ -259,8 +259,14 @@ public class FooterView extends StackScrollerDecorView {
-             mClearAllButton.setVisibility(View.GONE);
-             mSeenNotifsFooterTextView.setVisibility(View.VISIBLE);
-         } else {
--            mManageOrHistoryButton.setVisibility(View.VISIBLE);
--            mClearAllButton.setVisibility(View.VISIBLE);
-+            // KitKat UI Project (P20.3): the 4.4 shade had NO manage/
-+            // clear-all footer buttons (clear-all = the header X; settings
-+            // = the header gear). Keep them hidden in the normal path too -
-+            // this legacy branch previously re-showed both buttons every
-+            // layout pass, defeating the FooterViewModel hide. Re-enable by
-+            // restoring View.VISIBLE here and in the ViewModel flip.
-+            mManageOrHistoryButton.setVisibility(View.GONE);
-+            mClearAllButton.setVisibility(View.GONE);
-             mSeenNotifsFooterTextView.setVisibility(View.GONE);
-         }
-     }
 -- 
 2.53.0
 

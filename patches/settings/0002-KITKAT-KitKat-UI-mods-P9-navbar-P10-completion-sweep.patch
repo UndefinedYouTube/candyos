@@ -7,31 +7,30 @@ Subject: [PATCH 2/5] KITKAT: KitKat UI mods - P9 navbar, P10 completion sweep
 
 ---
  res/values/styles.xml |  5 +++++
- res/values/themes.xml | 29 +++++++++++++++++------------
- 2 files changed, 22 insertions(+), 12 deletions(-)
+ res/values/themes.xml | 30 +++++++++++++++++-------------
+ 2 files changed, 22 insertions(+), 13 deletions(-)
 
 diff --git a/res/values/styles.xml b/res/values/styles.xml
-index 0a28b016ca9..5bb3ce59f56 100644
+index 4f105e95bec..4e3b551866a 100644
 --- a/res/values/styles.xml
 +++ b/res/values/styles.xml
-@@ -758,7 +758,12 @@
+@@ -915,6 +915,11 @@
          <item name="android:gravity">start</item>
      </style>
  
-+    <!-- KitKat UI Project (11.6): the huge CollapsingToolbarTitle.Expanded
-+         "Settings" header is a modern signature; 4.4 carried a modest action
-+         bar title. Sized down to a compact 20sp primary title. -->
-     <style name="HomepageTitleText" parent="CollapsingToolbarTitle.Expanded">
-+        <item name="android:textSize">20sp</item>
-+        <item name="android:textColor">?android:attr/textColorPrimary</item>
-         <item name="android:layout_width">wrap_content</item>
-         <item name="android:layout_height">wrap_content</item>
-         <item name="android:layout_marginBottom">@dimen/homepage_title_margin_bottom</item>
++    <!-- KitKat UI Project (11.6): lineage-24 removed the CollapsingToolbar
++         homepage header and its CollapsingToolbarTitle style family, so the
++         former HomepageTitleText override (compact 20sp 4.4 title) has no
++         parent or consumer left - dropped in the los-24 port. -->
++
+     <style name="RequestManageCredentialsButtonPanel">
+         <item name="android:paddingStart">12dp</item>
+         <item name="android:paddingEnd">12dp</item>
 diff --git a/res/values/themes.xml b/res/values/themes.xml
-index b149bb8fd6b..1de867cb9bb 100644
+index 7422dbc2572..0b6bef447f7 100644
 --- a/res/values/themes.xml
 +++ b/res/values/themes.xml
-@@ -61,7 +61,7 @@
+@@ -66,7 +66,7 @@
  
          <!-- For AppBarLayout -->
          <item name="colorPrimary">@*android:color/primary_device_default_settings_light</item>
@@ -40,7 +39,7 @@ index b149bb8fd6b..1de867cb9bb 100644
  
          <!-- For slice view in settings -->
          <item name="sliceViewStyle">@style/Widget.SliceView.Settings</item>
-@@ -86,8 +86,11 @@
+@@ -94,8 +94,11 @@
          <!-- Redefine the ActionBar style for contentInsetStart -->
          <item name="android:actionBarStyle">@style/Widget.ActionBar.SubSettings</item>
  
@@ -54,7 +53,7 @@ index b149bb8fd6b..1de867cb9bb 100644
      </style>
  
      <style name="Theme.SubSettings" parent="Theme.SubSettings.Base"/>
-@@ -183,24 +186,26 @@
+@@ -185,8 +188,10 @@
      </style>
  
      <style name="Theme.Settings.HomeBase" parent="Theme.Settings.NoActionBar">
@@ -64,9 +63,10 @@ index b149bb8fd6b..1de867cb9bb 100644
 +             DeviceDefault DARK pins (4.4 Settings was dark). -->
 +        <item name="colorPrimary">@*android:color/primary_dark_device_default_settings</item>
 +        <item name="colorAccent">@*android:color/accent_device_default_dark</item>
+         <item name="android:listPreferredItemPaddingStart">16dp</item>
          <item name="preferenceTheme">@style/SettingsPreferenceTheme</item>
  
-         <!-- action bar, needed for search bar icon tinting -->
+@@ -194,17 +199,16 @@
          <item name="android:actionBarTheme">@*android:style/ThemeOverlay.DeviceDefault.ActionBar</item>
  
          <!-- Define this color for material design -->
@@ -81,6 +81,7 @@ index b149bb8fd6b..1de867cb9bb 100644
 -        <!-- Homepage should follow device default design, the values is same as device default theme.-->
 -        <item name="android:navigationBarColor">@android:color/white</item>
 -        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+-        <item name="android:colorBackground">@color/settingslib_materialColorSurfaceContainerLow</item>
 +        <!-- KitKat UI Project (11.6): 4.4 Settings homepage - dark bars,
 +             dark status bar (no light status bar flag), no nav divider. -->
 +        <item name="colorPrimaryDark">@*android:color/primary_dark_device_default_settings</item>

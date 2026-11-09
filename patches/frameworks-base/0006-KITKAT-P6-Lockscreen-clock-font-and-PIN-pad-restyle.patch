@@ -1,35 +1,45 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Tue, 20 Oct 2026 14:14:43 -0500
-Subject: [PATCH 06/20] KITKAT-P6: Lockscreen clock font and PIN pad restyle
+Date: Sun, 8 Nov 2026 16:09:02 -0600
+Subject: [PATCH 06/19] KITKAT-P6: Lockscreen clock font and PIN pad restyle
 
-- clock_default_large typeface cleaned up (font family comes from
-  config_clockFontFamily -> kitkat-lock-clock = Roboto2013-Thin; TextAnimator
-  weight variations are no-ops against static fonts so Thin renders
-  regardless of requested weight)
-- num_pad_key_background is a transparent ripple; press feedback resolves
-  through colorControlHighlight (= Holo blue family via the monet pin)
-- Klondike letters (ABC/DEF/...) restored from the hidden state they were
-  left in (b/172360102)
+- lockscreen clock renders in the bundled 4.4 donor lock-clock family
+  (kitkat-lock-clock, installed by fonts.xml; DefaultClockProvider
+  FLEX_TYPEFACE) instead of the monospace/Google Sans Flex clock
+- num_pad_key_background: flat 4.4 dark key
+- keyguard_num_pad_key: 4.4 donor label geometry
+
+los-24 port note: the customization module's clock_default_large.xml
+layout no longer exists (upstream moved the default lock clock to the
+FlexClockController/DefaultClockProvider pipeline), so the typeface
+cleanup now lives in DefaultClockProvider's FLEX_TYPEFACE.
+
+Change-Id: I71e1bfbcb0b0cb9f5f2c6f16a10ee24c58dbf363
 ---
- .../res/layout/clock_default_large.xml        |  2 +-
+ .../shared/clocks/DefaultClockProvider.kt     |  7 ++++-
  .../drawable/num_pad_key_background.xml       | 31 ++++++-------------
  .../layout/keyguard_num_pad_key.xml           |  2 +-
- 3 files changed, 12 insertions(+), 23 deletions(-)
+ 3 files changed, 17 insertions(+), 23 deletions(-)
 
-diff --git a/packages/SystemUI/customization/res/layout/clock_default_large.xml b/packages/SystemUI/customization/res/layout/clock_default_large.xml
-index 0139d50dcfba..8f5d0321ae7f 100644
---- a/packages/SystemUI/customization/res/layout/clock_default_large.xml
-+++ b/packages/SystemUI/customization/res/layout/clock_default_large.xml
-@@ -24,7 +24,7 @@
-     android:gravity="center_horizontal"
-     android:textSize="@dimen/large_clock_text_size"
-     android:fontFamily="@*android:string/config_clockFontFamily"
--    android:typeface="monospace"
-+    android:typeface="normal"
-     android:elegantTextHeight="false"
-     chargeAnimationDelay="200"
-     dozeWeight="200"
+diff --git a/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockProvider.kt b/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockProvider.kt
+index 379a414206da..b55009ae8567 100644
+--- a/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockProvider.kt
++++ b/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockProvider.kt
+@@ -122,8 +122,13 @@ constructor(
+         const val NUM_CLOCK_FONT_ANIMATION_STEPS = 30
+ 
+         val FLEX_TYPEFACE: Typeface by lazy {
++            // KitKat UI Project (P6): the lockscreen clock renders in the
++            // bundled 4.4 donor lock-clock family (data/fonts/fonts.xml,
++            // config_clockFontFamily) instead of Google Sans Flex. The KitKat
++            // face has no flex axes, so the tone/weight animation is a no-op
++            // and the clock renders as the static 4.4 typeface.
+             // TODO(b/364680873): Move constant to config_clockFontFamily when shipping
+-            Typeface.create("google-sans-flex-clock", Typeface.NORMAL)
++            Typeface.create("kitkat-lock-clock", Typeface.NORMAL)
+         }
+     }
+ }
 diff --git a/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml b/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml
 index 7455ad2ac5f8..d22663943cc9 100644
 --- a/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml

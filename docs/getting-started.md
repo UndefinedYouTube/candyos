@@ -60,7 +60,7 @@ fastmirror/close server helps). Subsequent syncs are incremental.
 ```
 cd ~/android/lineage
 source build/envsetup.sh
-lunch lineage_sdk_phone_x86_64-ap4a-userdebug
+lunch lineage_sdk_phone_x86_64-aosp_current-userdebug
 m -j8
 ```
 
@@ -112,7 +112,7 @@ Details and fallbacks:
   ```
   cd ~/android/lineage
   source build/envsetup.sh
-  lunch lineage_sdk_phone_x86_64-ap4a-userdebug
+  lunch lineage_sdk_phone_x86_64-aosp_current-userdebug
   emulator -gpu swiftshader_indirect -no-snapshot -no-audio \
            -skin 1080x2220 -dpi-device 440
   ```
@@ -139,7 +139,7 @@ on her side (no Android Studio, Java, or adb; unzipping is the install):
 ```
 
 It verifies the arm64 WebView LFS blob (pulling it if needed), builds
-`lineage_sdk_phone_arm64-ap4a-userdebug` (images in
+`lineage_sdk_phone_arm64-aosp_current-userdebug` (images in
 `out/target/product/emu64a/`), downloads Google's darwin-arm64 emulator
 package (cached in `out/candyos-mac-bundle/cache/`), and assembles
 `out/candyos-mac-bundle/CandyOS-macOS-Apple-Silicon.zip` (~3 GB): the

@@ -12,15 +12,22 @@
 //    (API 31+ requirement).
 //  - exported=true on the launcher activity and the media-button/widget
 //    receivers (API 31+ manifest rule).
-// Module keeps the name Eleven so vendor/lineage PRODUCT_PACKAGES
+// Module keeps the name Twelve (los-24 replaced Eleven with Twelve, the
+// media3 audio player; the KitKat port takes its slot - the stock
+// packages/apps/Twelve project is removed from the manifest by
+// manifest/candyos.xml) so vendor/lineage PRODUCT_PACKAGES
 // (common_mobile_full.mk) resolves unchanged.
 android_app {
-    name: "Eleven",
+    name: "Twelve",
     // Installs to the product partition like the app it replaces (the
     // lineage_sdk target enforces GSI artifact-path requirements on
     // /system).
     product_specific: true,
-    // Pre-30 target on purpose (see header).
+    // Stock Twelve (media3) overrode "Music"; the donor port IS
+    // com.android.music, keep the same override set.
+    overrides: [
+        "Music",
+    ],
     min_sdk_version: "21",
     sdk_version: "29",
     srcs: [

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Tue, 20 Oct 2026 14:14:23 -0500
-Subject: [PATCH 01/20] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
+Date: Sun, 8 Nov 2026 16:07:26 -0600
+Subject: [PATCH 01/19] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
 
 - 35 Material parents swapped for Holo across the DeviceDefault family
   (5 styles kept on Material for lack of Holo counterparts)
@@ -14,19 +14,21 @@ Subject: [PATCH 01/20] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
 - Also lands the square battery perimeter (config_batterymeterPerimeterPath,
   Phase 2) and the kitkat-lock-clock family pointer (config_clockFontFamily,
   Phase 6) since they share config.xml
+
+Change-Id: Ic5019b7a5669bf01543060606a340cd434c2db72
 ---
  core/res/res/values/config.xml                |   8 +-
  core/res/res/values/dimens.xml                |   4 +-
- .../res/res/values/styles_device_defaults.xml | 352 +++++++++---------
- .../res/res/values/themes_device_defaults.xml | 152 ++++----
+ .../res/res/values/styles_device_defaults.xml | 354 +++++++++---------
+ .../res/res/values/themes_device_defaults.xml | 158 ++++----
  .../theme/ThemeOverlayController.java         |   9 +-
- 5 files changed, 274 insertions(+), 251 deletions(-)
+ 5 files changed, 278 insertions(+), 255 deletions(-)
 
 diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
-index aed3b8279045..f082768792f0 100644
+index a19202ff1683..d1268fd18066 100644
 --- a/core/res/res/values/config.xml
 +++ b/core/res/res/values/config.xml
-@@ -5022,9 +5022,9 @@
+@@ -5629,9 +5629,9 @@
      <string name="config_mediaProjectionPermissionDialogComponent" translatable="false">com.android.systemui/com.android.systemui.mediaprojection.permission.MediaProjectionPermissionActivity</string>
  
      <!-- Corner radius of system dialogs -->
@@ -38,7 +40,7 @@ index aed3b8279045..f082768792f0 100644
      <!-- Corner radius for bottom sheet system dialogs -->
      <dimen name="config_bottomDialogCornerRadius">16dp</dimen>
      <!-- Corner radius of system progress bars -->
-@@ -5039,7 +5039,7 @@
+@@ -5646,7 +5646,7 @@
      <string name="config_bodyFontFamilyMedium" translatable="false">sans-serif-medium</string>
  
      <!-- Name of the font family to use in the default lockscreen clock -->
@@ -47,7 +49,7 @@ index aed3b8279045..f082768792f0 100644
  
      <!-- Size of icon shown beside a preference locked by admin -->
      <dimen name="config_restrictedIconSize">@dimen/restricted_icon_size_material</dimen>
-@@ -5379,7 +5379,7 @@
+@@ -5982,7 +5982,7 @@
      <!-- All of the paths defined for the batterymeter are defined on a 12x20 canvas, and must
       be parsable by android.utill.PathParser -->
      <string name="config_batterymeterPerimeterPath" translatable="false">
@@ -57,7 +59,7 @@ index aed3b8279045..f082768792f0 100644
      <string name="config_batterymeterErrorPerimeterPath" translatable="false">@string/config_batterymeterPerimeterPath</string>
      <string name="config_batterymeterFillMask" translatable="false">
 diff --git a/core/res/res/values/dimens.xml b/core/res/res/values/dimens.xml
-index 291a5936330a..e20b9b3c9307 100644
+index 729e6d59eec5..b7b2470b245a 100644
 --- a/core/res/res/values/dimens.xml
 +++ b/core/res/res/values/dimens.xml
 @@ -41,7 +41,7 @@
@@ -79,12 +81,12 @@ index 291a5936330a..e20b9b3c9307 100644
           Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
           -->
 diff --git a/core/res/res/values/styles_device_defaults.xml b/core/res/res/values/styles_device_defaults.xml
-index 3b2f24409a88..aa26fc5a81ce 100644
+index 288741b0bbd0..29732beb6f04 100644
 --- a/core/res/res/values/styles_device_defaults.xml
 +++ b/core/res/res/values/styles_device_defaults.xml
 @@ -32,69 +32,69 @@ easier.
   -->
- <resources>
+ <resources xmlns:android="http://schemas.android.com/apk/res/android">
      <!-- Widget Styles -->
 -    <style name="Widget.DeviceDefault" parent="Widget.Material"/>
 -    <style name="Widget.DeviceDefault.Button" parent="Widget.Material.Button"/>
@@ -480,9 +482,9 @@ index 3b2f24409a88..aa26fc5a81ce 100644
          <item name="fontFamily">@string/config_bodyFontFamily</item>
      </style>
      <style name="TextAppearance.DeviceDefault.Notification" parent="TextAppearance.Material.Notification">
-@@ -302,87 +302,87 @@ easier.
+@@ -304,87 +304,87 @@ easier.
      <style name="TextAppearance.DeviceDefault.Notification.Time" parent="TextAppearance.Material.Notification.Time">
-         <item name="fontFamily">@string/config_bodyFontFamily</item>
+         <item name="fontFamily">variable-body-small</item>
      </style>
 -    <style name="TextAppearance.DeviceDefault.Widget" parent="TextAppearance.Material.Widget">
 +    <style name="TextAppearance.DeviceDefault.Widget" parent="TextAppearance.Holo.Widget">
@@ -593,11 +595,20 @@ index 3b2f24409a88..aa26fc5a81ce 100644
          <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
      </style>
      <style name="TextAppearance.DeviceDefault.Widget.Toolbar.Title" parent="TextAppearance.DeviceDefault.Widget.ActionBar.Title"/>
+@@ -449,7 +449,7 @@ easier.
+     <style name="WindowTitleBackground.DeviceDefault" parent="WindowTitleBackground.Material"/>
+ 
+     <!-- Other Styles -->
+-    <style name="DeviceDefault.ButtonBar" parent="Widget.Material.ButtonBar"/>
++    <style name="DeviceDefault.ButtonBar" parent="Widget.Holo.ButtonBar"/>
+     <style name="DeviceDefault.ButtonBar.AlertDialog" parent="Widget.Material.ButtonBar.AlertDialog"/>
+     <style name="DeviceDefault.SegmentedButton" parent="Widget.Material.SegmentedButton"/>
+ 
 diff --git a/core/res/res/values/themes_device_defaults.xml b/core/res/res/values/themes_device_defaults.xml
-index ee191449ac35..665de2de9bd9 100644
+index 9fdc430d8714..c4e4a4acd5ce 100644
 --- a/core/res/res/values/themes_device_defaults.xml
 +++ b/core/res/res/values/themes_device_defaults.xml
-@@ -211,24 +211,33 @@ easier.
+@@ -211,27 +211,36 @@ easier.
          <item name="mediaRouteButtonStyle">@style/Widget.DeviceDefault.MediaRouteButton</item>
  
          <!-- Color palette -->
@@ -605,17 +616,17 @@ index ee191449ac35..665de2de9bd9 100644
 -        <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
 -        <item name="colorAccent">@color/accent_device_default_dark</item>
 -        <item name="colorAccentPrimary">@color/accent_primary_device_default</item>
--        <item name="colorAccentSecondary">@color/accent_secondary_device_default</item>
--        <item name="colorAccentTertiary">@color/accent_tertiary_device_default</item>
--        <item name="colorAccentPrimaryVariant">@color/accent_primary_variant_dark_device_default</item>
--        <item name="colorAccentSecondaryVariant">@color/accent_secondary_variant_dark_device_default</item>
--        <item name="colorAccentTertiaryVariant">@color/accent_tertiary_variant_dark_device_default</item>
--        <item name="colorSurface">@color/surface_dark</item>
--        <item name="colorSurfaceHighlight">@color/surface_highlight_dark</item>
--        <item name="colorSurfaceVariant">@color/surface_variant_dark</item>
--        <item name="colorSurfaceHeader">@color/surface_header_dark</item>
+-        <item name="colorAccentSecondary">@color/system_secondary_dark</item>
+-        <item name="colorAccentTertiary">@color/system_tertiary_dark</item>
+-        <item name="colorAccentPrimaryVariant">@color/system_primary_container_dark</item>
+-        <item name="colorAccentSecondaryVariant">@color/system_secondary_container_dark</item>
+-        <item name="colorAccentTertiaryVariant">@color/system_tertiary_container_dark</item>
+-        <item name="colorSurface">@color/system_surface_container_dark</item>
+-        <item name="colorSurfaceHighlight">@color/system_surface_bright_dark</item>
+-        <item name="colorSurfaceVariant">@color/system_surface_container_high_dark</item>
+-        <item name="colorSurfaceHeader">@color/system_surface_container_highest_dark</item>
 -        <item name="colorError">@color/error_color_device_default_dark</item>
--        <item name="colorBackground">@color/background_device_default_dark</item>
+-        <item name="colorBackground">@color/system_surface_container_dark</item>
 -        <item name="colorBackgroundFloating">@color/background_floating_device_default_dark</item>
 +        <!-- KitKat UI Project (Phase 1): Holo palette -->
 +        <item name="colorPrimary">@color/holo_blue_light</item>
@@ -636,6 +647,9 @@ index ee191449ac35..665de2de9bd9 100644
 +        <item name="colorBackgroundFloating">@color/background_holo_dark</item>
          <item name="colorPopupBackground">?attr/colorBackgroundFloating</item>
          <item name="panelColorBackground">?attr/colorBackgroundFloating</item>
+-        <item name="textColorPrimary">@color/system_on_surface_dark</item>
+-        <item name="textColorSecondary">@color/system_on_surface_variant_dark</item>
+-        <item name="textColorTertiary">@color/system_outline_dark</item>
 +        <item name="colorControlActivated">@color/holo_blue_light</item>
 +        <item name="colorControlNormal">#ffb3b3b3</item>
 +        <item name="colorControlHighlight">#33999999</item>
@@ -644,10 +658,13 @@ index ee191449ac35..665de2de9bd9 100644
 +        <item name="navigationBarColor">#ff000000</item>
 +        <item name="windowLightStatusBar">false</item>
 +        <item name="forceDarkAllowed">false</item>
-         <item name="textColorPrimary">@color/text_color_primary_device_default_dark</item>
-         <item name="textColorSecondary">@color/text_color_secondary_device_default_dark</item>
-         <item name="textColorTertiary">@color/text_color_tertiary_device_default_dark</item>
-@@ -289,7 +298,7 @@ easier.
++        <item name="textColorPrimary">@color/text_color_primary_device_default_dark</item>
++        <item name="textColorSecondary">@color/text_color_secondary_device_default_dark</item>
++        <item name="textColorTertiary">@color/text_color_tertiary_device_default_dark</item>
+         <item name="textColorPrimaryInverse">@color/system_on_surface_light</item>
+         <item name="textColorSecondaryInverse">@color/system_on_surface_variant_light</item>
+         <item name="textColorTertiaryInverse">@color/system_outline_light</item>
+@@ -243,7 +252,7 @@ easier.
      <style name="Theme.DeviceDefault" parent="Theme.DeviceDefaultBase" />
  
      <!-- Variant of {@link #Theme_DeviceDefault} with no action bar -->
@@ -656,7 +673,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -384,7 +393,7 @@ easier.
+@@ -292,7 +301,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault} with no action bar and no status bar.  This theme
           sets {@link android.R.attr#windowFullscreen} to true.  -->
@@ -665,7 +682,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -481,7 +490,7 @@ easier.
+@@ -343,7 +352,7 @@ easier.
      extending in to overscan region.  This theme
      sets {@link android.R.attr#windowFullscreen} and {@link android.R.attr#windowOverscan}
      to true. -->
@@ -674,7 +691,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -577,7 +586,7 @@ easier.
+@@ -393,7 +402,7 @@ easier.
      <!-- Variant of {@link #Theme_DeviceDefault} that has no title bar and translucent
           system decor.  This theme sets {@link android.R.attr#windowTranslucentStatus} and
           {@link android.R.attr#windowTranslucentNavigation} to true. -->
@@ -683,7 +700,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -673,7 +682,7 @@ easier.
+@@ -443,7 +452,7 @@ easier.
      <!-- DeviceDefault theme for dialog windows and activities. This changes the window to be
      floating (not fill the entire screen), and puts a frame around its contents. You can set this
      theme on an activity if you would like to make an activity that looks like a Dialog. -->
@@ -692,7 +709,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -776,7 +785,7 @@ easier.
+@@ -500,7 +509,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault_Dialog} that has a nice minimum width for a
      regular dialog. -->
@@ -701,7 +718,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -870,7 +879,7 @@ easier.
+@@ -548,7 +557,7 @@ easier.
      </style>
  
      <!-- Variant of {@link #Theme_DeviceDefault_Dialog} without an action bar -->
@@ -710,7 +727,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -965,7 +974,7 @@ easier.
+@@ -597,7 +606,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault_Dialog_NoActionBar} that has a nice minimum width
      for a regular dialog. -->
@@ -719,7 +736,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1076,7 +1085,7 @@ easier.
+@@ -662,7 +671,7 @@ easier.
  
      <!-- DeviceDefault theme for a window that will be displayed either full-screen on smaller
      screens (small, normal) or as a dialog on larger screens (large, xlarge). -->
@@ -728,7 +745,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1172,7 +1181,7 @@ easier.
+@@ -712,7 +721,7 @@ easier.
      <!-- DeviceDefault theme for a window without an action bar that will be displayed either
      full-screen on smaller screens (small, normal) or as a dialog on larger screens (large,
      xlarge). -->
@@ -737,7 +754,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1266,7 +1275,7 @@ easier.
+@@ -760,7 +769,7 @@ easier.
      </style>
  
      <!-- DeviceDefault theme for a presentation window on a secondary display. -->
@@ -746,7 +763,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1362,7 +1371,7 @@ easier.
+@@ -810,7 +819,7 @@ easier.
      <!-- DeviceDefault theme for panel windows. This removes all extraneous window
      decorations, so you basically have an empty rectangle in which to place your content. It makes
      the window floating, with a transparent background, and turns off dimming behind the window. -->
@@ -755,7 +772,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1457,7 +1466,7 @@ easier.
+@@ -859,7 +868,7 @@ easier.
  
      <!-- DeviceDefault theme for windows that want to have the user's selected wallpaper appear
      behind them. -->
@@ -764,7 +781,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1552,7 +1561,7 @@ easier.
+@@ -908,7 +917,7 @@ easier.
  
      <!-- DeviceDefault theme for windows that want to have the user's selected wallpaper appear
      behind them and without an action bar. -->
@@ -773,7 +790,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -1647,24 +1656,33 @@ easier.
+@@ -957,24 +966,33 @@ easier.
  
      <!-- DeviceDefault style for input methods, which is used by the
           {@link android.inputmethodservice.InputMethodService} class.-->
@@ -784,17 +801,17 @@ index ee191449ac35..665de2de9bd9 100644
 -        <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
 -        <item name="colorAccent">@color/accent_device_default_light</item>
 -        <item name="colorAccentPrimary">@color/accent_primary_device_default</item>
--        <item name="colorAccentSecondary">@color/accent_secondary_device_default</item>
--        <item name="colorAccentTertiary">@color/accent_tertiary_device_default</item>
--        <item name="colorAccentPrimaryVariant">@color/accent_primary_variant_light_device_default</item>
--        <item name="colorAccentSecondaryVariant">@color/accent_secondary_variant_light_device_default</item>
--        <item name="colorAccentTertiaryVariant">@color/accent_tertiary_variant_light_device_default</item>
--        <item name="colorSurface">@color/surface_light</item>
--        <item name="colorSurfaceHighlight">@color/surface_highlight_light</item>
--        <item name="colorSurfaceVariant">@color/surface_variant_light</item>
--        <item name="colorSurfaceHeader">@color/surface_header_light</item>
+-        <item name="colorAccentSecondary">@color/system_secondary_dark</item>
+-        <item name="colorAccentTertiary">@color/system_tertiary_dark</item>
+-        <item name="colorAccentPrimaryVariant">@color/system_primary_container_light</item>
+-        <item name="colorAccentSecondaryVariant">@color/system_secondary_container_light</item>
+-        <item name="colorAccentTertiaryVariant">@color/system_tertiary_container_light</item>
+-        <item name="colorSurface">@color/system_surface_container_light</item>
+-        <item name="colorSurfaceHighlight">@color/system_surface_bright_light</item>
+-        <item name="colorSurfaceVariant">@color/system_surface_container_high_light</item>
+-        <item name="colorSurfaceHeader">@color/system_surface_container_highest_light</item>
 -        <item name="colorError">@color/error_color_device_default_light</item>
--        <item name="colorBackground">@color/background_device_default_light</item>
+-        <item name="colorBackground">@color/system_surface_container_light</item>
 -        <item name="colorBackgroundFloating">@color/background_floating_device_default_light</item>
 +        <!-- KitKat UI Project (Phase 1): Holo palette -->
 +        <item name="colorPrimary">@color/holo_blue_dark</item>
@@ -821,11 +838,11 @@ index ee191449ac35..665de2de9bd9 100644
 +        <item name="navigationBarColor">#ff000000</item>
 +        <item name="windowLightStatusBar">false</item>
 +        <item name="forceDarkAllowed">false</item>
-         <item name="textColorPrimary">@color/text_color_primary_device_default_light</item>
-         <item name="textColorSecondary">@color/text_color_secondary_device_default_light</item>
-         <item name="textColorTertiary">@color/text_color_tertiary_device_default_light</item>
-@@ -1835,7 +1853,7 @@ easier.
-         <item name="materialColorError">@color/system_error_light</item>
+         <item name="textColorPrimary">@color/system_on_surface_light</item>
+         <item name="textColorSecondary">@color/system_on_surface_variant_light</item>
+         <item name="textColorTertiary">@color/system_outline_light</item>
+@@ -1053,7 +1071,7 @@ easier.
+         <item name="toolbarStyle">@style/Widget.DeviceDefault.Toolbar</item>
      </style>
  
 -    <style name="Theme.DeviceDefault.Dialog.Alert" parent="Theme.Material.Dialog.Alert">
@@ -833,7 +850,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault</item>
  
          <!-- Dialog attributes -->
-@@ -1937,7 +1955,7 @@ easier.
+@@ -1109,7 +1127,7 @@ easier.
          <item name="windowCloseOnTouchOutside">false</item>
      </style>
  
@@ -842,8 +859,8 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -2030,7 +2048,7 @@ easier.
-         <item name="materialColorError">@color/system_error_dark</item>
+@@ -1156,7 +1174,7 @@ easier.
+         <item name="toolbarStyle">@style/Widget.DeviceDefault.Toolbar</item>
      </style>
  
 -    <style name="Theme.DeviceDefault.Dialog.NoFrame" parent="Theme.Material.Dialog.NoFrame">
@@ -851,7 +868,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -2124,7 +2142,7 @@ easier.
+@@ -1204,7 +1222,7 @@ easier.
      </style>
  
      <!-- Variant of {@link #Theme_DeviceDefault} with a light-colored style -->
@@ -860,7 +877,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Text styles -->
          <item name="textAppearance">@style/TextAppearance.DeviceDefault</item>
          <item name="textAppearanceInverse">@style/TextAppearance.DeviceDefault.Inverse</item>
-@@ -2356,7 +2374,7 @@ easier.
+@@ -1390,7 +1408,7 @@ easier.
  
      <!-- Variant of the DeviceDefault (light) theme that has a solid (opaque) action bar with an
      inverse color profile. -->
@@ -869,7 +886,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_dark</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
-@@ -2450,7 +2468,7 @@ easier.
+@@ -1438,7 +1456,7 @@ easier.
      </style>
  
      <!-- Variant of {@link #Theme_DeviceDefault_Light} with no action bar -->
@@ -878,7 +895,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -2545,7 +2563,7 @@ easier.
+@@ -1487,7 +1505,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault_Light} with no action bar and no status bar.
           This theme sets {@link android.R.attr#windowFullscreen} to true.  -->
@@ -887,7 +904,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -2642,7 +2660,7 @@ easier.
+@@ -1538,7 +1556,7 @@ easier.
      and extending in to overscan region.  This theme
      sets {@link android.R.attr#windowFullscreen} and {@link android.R.attr#windowOverscan}
      to true. -->
@@ -896,7 +913,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -2738,7 +2756,7 @@ easier.
+@@ -1588,7 +1606,7 @@ easier.
      <!-- Variant of {@link #Theme_DeviceDefault_Light} that has no title bar and translucent
           system decor.  This theme sets {@link android.R.attr#windowTranslucentStatus} and
           {@link android.R.attr#windowTranslucentNavigation} to true. -->
@@ -905,7 +922,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -2834,7 +2852,7 @@ easier.
+@@ -1638,7 +1656,7 @@ easier.
      <!-- DeviceDefault light theme for dialog windows and activities. This changes the window to be
      floating (not fill the entire screen), and puts a frame around its contents. You can set this
      theme on an activity if you would like to make an activity that looks like a Dialog.-->
@@ -914,7 +931,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -2935,7 +2953,7 @@ easier.
+@@ -1693,7 +1711,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog} that has a nice minimum width for a
      regular dialog. -->
@@ -923,7 +940,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3032,7 +3050,7 @@ easier.
+@@ -1744,7 +1762,7 @@ easier.
      </style>
  
      <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog} without an action bar -->
@@ -932,7 +949,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3130,7 +3148,7 @@ easier.
+@@ -1796,7 +1814,7 @@ easier.
  
      <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog_NoActionBar} that has a nice minimum
      width for a regular dialog. -->
@@ -941,7 +958,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3386,7 +3404,7 @@ easier.
+@@ -1914,7 +1932,7 @@ easier.
  
      <!-- DeviceDefault light theme for a window that will be displayed either full-screen on smaller
      screens (small, normal) or as a dialog on larger screens (large, xlarge). -->
@@ -950,7 +967,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3485,7 +3503,7 @@ easier.
+@@ -1967,7 +1985,7 @@ easier.
      <!-- DeviceDefault light theme for a window without an action bar that will be displayed either
      full-screen on smaller screens (small, normal) or as a dialog on larger screens (large,
      xlarge). -->
@@ -959,7 +976,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3582,7 +3600,7 @@ easier.
+@@ -2018,7 +2036,7 @@ easier.
      </style>
  
      <!-- DeviceDefault light theme for a presentation window on a secondary display. -->
@@ -968,7 +985,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
          <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
  
-@@ -3681,7 +3699,7 @@ easier.
+@@ -2071,7 +2089,7 @@ easier.
      <!-- DeviceDefault light theme for panel windows. This removes all extraneous window
      decorations, so you basically have an empty rectangle in which to place your content. It makes
      the window floating, with a transparent background, and turns off dimming behind the window. -->
@@ -977,8 +994,8 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -3774,7 +3792,7 @@ easier.
-         <item name="materialColorError">@color/system_error_light</item>
+@@ -2118,7 +2136,7 @@ easier.
+         <item name="toolbarStyle">@style/Widget.DeviceDefault.Toolbar</item>
      </style>
  
 -    <style name="Theme.DeviceDefault.Light.Dialog.Alert" parent="Theme.Material.Light.Dialog.Alert">
@@ -986,7 +1003,7 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
  
          <!-- Color palette -->
-@@ -3871,7 +3889,7 @@ easier.
+@@ -2169,7 +2187,7 @@ easier.
  
      <style name="Theme.DeviceDefault.Dialog.Alert.DayNight" parent="Theme.DeviceDefault.Light.Dialog.Alert" />
  
@@ -995,7 +1012,7 @@ index ee191449ac35..665de2de9bd9 100644
          <!-- Color palette -->
          <item name="colorPrimary">@color/primary_device_default_light</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
-@@ -4315,7 +4333,7 @@ easier.
+@@ -2383,7 +2401,7 @@ easier.
      </style>
  
      <!-- Variant of {@link #Theme_DeviceDefault_Settings_Dark} with no action bar -->
@@ -1005,10 +1022,10 @@ index ee191449ac35..665de2de9bd9 100644
          <item name="colorPrimary">@color/primary_device_default_settings</item>
          <item name="colorPrimaryDark">@color/primary_dark_device_default_settings</item>
 diff --git a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
-index 3fe5fe4ef8c7..0dec4b2d5fc3 100644
+index ea7a1925d5ef..c0094107da41 100644
 --- a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
 +++ b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
-@@ -636,11 +636,16 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
+@@ -684,11 +684,16 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
       * Return the main theme color from a given {@link WallpaperColors} instance.
       */
      protected int getNeutralColor(@NonNull WallpaperColors wallpaperColors) {
@@ -1026,7 +1043,7 @@ index 3fe5fe4ef8c7..0dec4b2d5fc3 100644
 +        return 0xFF33B5E5;
      }
  
-     private static DynamicScheme dynamicSchemeFromStyle(Style style, int color,
+     @VisibleForTesting
 -- 
 2.53.0
 

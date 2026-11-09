@@ -19,10 +19,10 @@ Change-Id: Ic293884c587363778ee57bb95a6aee56d72bf006
  1 file changed, 8 insertions(+)
 
 diff --git a/config/common.mk b/config/common.mk
-index d5e1e398..ca768305 100644
+index 3c2e805a..12d6f8a5 100644
 --- a/config/common.mk
 +++ b/config/common.mk
-@@ -256,6 +256,14 @@ CUSTOM_LOCALES += \
+@@ -298,6 +298,14 @@ CUSTOM_LOCALES += \
  PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += vendor/crowdin/overlay
  PRODUCT_PACKAGE_OVERLAYS += vendor/crowdin/overlay
  

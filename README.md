@@ -35,7 +35,7 @@ git clone https://github.com/UndefinedYouTube/candyos ~/android/candyos
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 cd ~/android/lineage
 source build/envsetup.sh
-lunch lineage_sdk_phone_x86_64-ap4a-userdebug
+lunch lineage_sdk_phone_x86_64-aosp_current-userdebug
 m -j8
 ~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage
 ```

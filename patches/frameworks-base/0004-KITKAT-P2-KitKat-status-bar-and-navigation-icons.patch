@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Tue, 20 Oct 2026 14:14:36 -0500
-Subject: [PATCH 04/20] KITKAT-P2: KitKat status bar and navigation icons
+Date: Sun, 8 Nov 2026 16:07:58 -0600
+Subject: [PATCH 04/19] KITKAT-P2: KitKat status bar and navigation icons
 
 - Status bar clock defaults to the right side (ClockController)
 - Navbar glyphs rewritten as white outlined triangle/circle/square
@@ -10,27 +10,26 @@ Subject: [PATCH 04/20] KITKAT-P2: KitKat status bar and navigation icons
   arc-fan glyphs with level-based dimming
 - Mobile signal needs no change: the active framework ic_signal_cellular
   family is already the classic triangle + partial fill design
+
+Change-Id: I429027fad4b9518fc9d953072df603e686e338d8
 ---
- core/res/res/drawable/ic_wifi_signal_0.xml    | 24 +++++++-
- core/res/res/drawable/ic_wifi_signal_1.xml    | 31 +++++++---
- core/res/res/drawable/ic_wifi_signal_2.xml    | 31 +++++++---
- core/res/res/drawable/ic_wifi_signal_3.xml    | 31 +++++++---
- core/res/res/drawable/ic_wifi_signal_4.xml    | 28 ++++++++--
- .../SettingsLib/res/drawable/ic_wifi_0.xml    | 56 +++++++++----------
- .../res/drawable/ic_wifi_0_error.xml          | 51 ++++++++++-------
- .../SettingsLib/res/drawable/ic_wifi_1.xml    | 55 +++++++++---------
- .../res/drawable/ic_wifi_1_error.xml          | 50 ++++++++++-------
- .../SettingsLib/res/drawable/ic_wifi_2.xml    | 54 +++++++++---------
- .../res/drawable/ic_wifi_2_error.xml          | 49 +++++++++-------
- .../SettingsLib/res/drawable/ic_wifi_3.xml    | 53 +++++++++---------
- .../res/drawable/ic_wifi_3_error.xml          | 48 ++++++++++------
- .../SettingsLib/res/drawable/ic_wifi_4.xml    | 52 +++++++++--------
- .../res/drawable/ic_wifi_4_error.xml          | 47 ++++++++++------
- .../SystemUI/res/drawable/ic_sysbar_back.xml  | 13 +++--
- .../SystemUI/res/drawable/ic_sysbar_home.xml  | 13 +++--
- .../res/drawable/ic_sysbar_recent.xml         | 13 +++--
- .../statusbar/phone/ClockController.java      |  3 +-
- 19 files changed, 422 insertions(+), 280 deletions(-)
+ core/res/res/drawable/ic_wifi_signal_0.xml    | 24 ++++-
+ core/res/res/drawable/ic_wifi_signal_1.xml    | 31 +++++--
+ core/res/res/drawable/ic_wifi_signal_2.xml    | 31 +++++--
+ core/res/res/drawable/ic_wifi_signal_3.xml    | 31 +++++--
+ core/res/res/drawable/ic_wifi_signal_4.xml    | 28 +++++-
+ .../SettingsLib/res/drawable/ic_wifi_0.xml    | 66 +++++++-------
+ .../res/drawable/ic_wifi_0_error.xml          | 87 ++++++++-----------
+ .../SettingsLib/res/drawable/ic_wifi_1.xml    | 65 +++++++-------
+ .../res/drawable/ic_wifi_1_error.xml          | 86 ++++++++----------
+ .../SettingsLib/res/drawable/ic_wifi_2.xml    | 64 +++++++-------
+ .../res/drawable/ic_wifi_2_error.xml          | 85 ++++++++----------
+ .../SettingsLib/res/drawable/ic_wifi_3.xml    | 63 +++++++-------
+ .../res/drawable/ic_wifi_3_error.xml          | 84 ++++++++----------
+ .../SystemUI/res/drawable/ic_sysbar_back.xml  | 13 ++-
+ .../SystemUI/res/drawable/ic_sysbar_home.xml  | 13 ++-
+ .../res/drawable/ic_sysbar_recent.xml         | 13 ++-
+ 16 files changed, 409 insertions(+), 375 deletions(-)
 
 diff --git a/core/res/res/drawable/ic_wifi_signal_0.xml b/core/res/res/drawable/ic_wifi_signal_0.xml
 index cab8be3d3482..22d4cf99c791 100644
@@ -225,12 +224,12 @@ index 04b63af4a372..902b5bd2c5a6 100644
 +  />
 +</vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_0.xml b/packages/SettingsLib/res/drawable/ic_wifi_0.xml
-index 8ff65540c505..95b49a2d7f4a 100644
+index 7f98457a4c76..b0c9dfe0d8b8 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_0.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_0.xml
 @@ -1,37 +1,31 @@
 -<!--
--     Copyright (C) 2023 The Android Open Source Project
+-     Copyright (C) 2025 The Android Open Source Project
 -
 -     Licensed under the Apache License, Version 2.0 (the "License");
 -     you may not use this file except in compliance with the License.
@@ -244,123 +243,158 @@ index 8ff65540c505..95b49a2d7f4a 100644
 -     See the License for the specific language governing permissions and
 -     limitations under the License.
 --->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="17.0dp"
+-    android:height="12.58dp"
+-    android:viewportHeight="12.0"
+-    android:viewportWidth="16.21">
+-
+-    <path
+-        android:fillAlpha="0.45"
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="18dp"
--        android:height="13dp"
--        android:viewportWidth="18.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.523,3.314C0.32,3.502 0.32,3.819 0.516,4.015L1.223,4.722C1.418,4.917 1.734,4.916 1.938,4.73C5.936,1.09 12.066,1.09 16.064,4.73C16.268,4.916 16.584,4.917 16.779,4.722L17.486,4.015C17.682,3.819 17.682,3.502 17.479,3.314C12.698,-1.105 5.304,-1.105 0.523,3.314Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M15.011,6.49C15.207,6.294 15.207,5.976 15.002,5.792C11.592,2.736 6.411,2.736 3,5.792C2.795,5.976 2.795,6.294 2.991,6.49L3.698,7.197C3.893,7.392 4.209,7.39 4.417,7.209C7.042,4.93 10.96,4.93 13.585,7.209C13.793,7.39 14.109,7.392 14.304,7.197L15.011,6.49Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M5.465,8.964C5.27,8.769 5.269,8.45 5.481,8.273C7.515,6.576 10.487,6.576 12.521,8.273C12.733,8.45 12.732,8.769 12.537,8.964L11.83,9.672C11.634,9.867 11.319,9.863 11.099,9.698C9.859,8.767 8.143,8.767 6.904,9.698C6.683,9.863 6.368,9.867 6.173,9.672L5.465,8.964Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M10.062,11.439C10.257,11.244 10.259,10.92 10.022,10.779C9.395,10.407 8.608,10.407 7.98,10.779C7.743,10.92 7.745,11.244 7.94,11.439L8.647,12.146C8.843,12.342 9.159,12.342 9.355,12.146L10.062,11.439Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M7.7,11.3 a1.3,1.3 0 1 0 2.6,0 a1.3,1.3 0 1 0 -2.6,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-    <path
+-        android:fillAlpha="0.45"
+-        android:fillColor="#000"
+-        android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-
+-    <path
+-        android:fillAlpha="0.45"
+-        android:fillColor="#000"
+-        android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_0_error.xml b/packages/SettingsLib/res/drawable/ic_wifi_0_error.xml
-index db31b9dd0fcd..a2ed0e6d7197 100644
+index 3a9bba5cd526..ff37b98cbad3 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_0_error.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_0_error.xml
-@@ -1,28 +1,37 @@
+@@ -1,52 +1,37 @@
+-<!--
+-     Copyright (C) 2025 The Android Open Source Project
+-
+-     Licensed under the Apache License, Version 2.0 (the "License");
+-     you may not use this file except in compliance with the License.
+-     You may obtain a copy of the License at
+-
+-          http://www.apache.org/licenses/LICENSE-2.0
+-
+-     Unless required by applicable law or agreed to in writing, software
+-     distributed under the License is distributed on an "AS IS" BASIS,
+-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-     See the License for the specific language governing permissions and
+-     limitations under the License.
+--->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="21.0dp"
+-    android:height="15.66dp"
+-    android:viewportHeight="13.5"
+-    android:viewportWidth="18.1">
+-
+-    <group>
+-        <!-- clip-out the circle which will contain the exclamation point (below this group) -->
+-        <clip-path android:pathData="
+-            M0,0
+-            H18.1
+-            V13.5
+-            H0
+-            Z
+-            M15.109,13.5C17.871,13.5 20.109,11.261 20.109,8.5C20.109,5.739 17.871,3.5 15.109,3.5C12.348,3.5 10.109,5.739 10.109,8.5C10.109,11.261 12.348,13.5 15.109,13.5Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-    </group>
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="17dp"
--        android:height="13dp"
--        android:viewportWidth="17.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.146,4.015C-0.05,3.819 -0.05,3.502 0.153,3.314C4.002,-0.244 9.545,-0.937 14.055,1.234C13.339,1.449 12.792,2.053 12.66,2.801C8.998,1.281 4.65,1.924 1.568,4.73C1.364,4.916 1.048,4.917 0.853,4.722L0.146,4.015Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M12.63,4.435C9.406,2.836 5.424,3.288 2.63,5.792C2.424,5.976 2.425,6.294 2.621,6.49L3.328,7.197C3.523,7.392 3.839,7.39 4.047,7.209C6.484,5.094 10.033,4.942 12.63,6.753V4.435Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M5.095,8.964C4.9,8.769 4.899,8.45 5.111,8.273C7.145,6.576 10.117,6.576 12.151,8.273C12.363,8.45 12.362,8.769 12.166,8.964L11.459,9.672C11.264,9.867 10.949,9.863 10.728,9.698C9.489,8.767 7.773,8.767 6.533,9.698C6.313,9.863 5.998,9.867 5.802,9.672L5.095,8.964Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M9.652,10.779C9.889,10.92 9.887,11.244 9.692,11.439L8.984,12.146C8.789,12.342 8.473,12.342 8.277,12.146L7.57,11.439C7.375,11.244 7.373,10.92 7.61,10.779C8.237,10.407 9.024,10.407 9.652,10.779Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M9,5.6 L9,9.8"
 +        android:strokeColor="#000"
 +        android:strokeWidth="1.8"
 +        android:strokeLineCap="round"
 +    />
-     <path
--        android:pathData="M14.63,11.15C14.63,10.598 15.078,10.15 15.63,10.15C16.182,10.15 16.63,10.598 16.63,11.15C16.63,11.703 16.182,12.15 15.63,12.15C15.078,12.15 14.63,11.703 14.63,11.15Z"
--        android:fillColor="#000"/>
--    <path
--        android:pathData="M14.63,3.15C14.63,2.874 14.854,2.65 15.13,2.65H16.13C16.406,2.65 16.63,2.874 16.63,3.15V8.15C16.63,8.427 16.406,8.65 16.13,8.65H15.13C14.854,8.65 14.63,8.427 14.63,8.15V3.15Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M8.05,12.0 a0.95,0.95 0 1 0 1.9,0 a0.95,0.95 0 1 0 -1.9,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M15.109,5C14.699,5 14.359,5.34 14.359,5.75L14.359,8.75C14.359,9.16 14.699,9.5 15.109,9.5C15.519,9.5 15.859,9.16 15.859,8.75L15.859,5.75C15.859,5.34 15.519,5 15.109,5ZM15.109,12C15.519,12 15.859,11.66 15.859,11.25C15.859,10.84 15.519,10.5 15.109,10.5C14.699,10.5 14.359,10.84 14.359,11.25C14.359,11.66 14.699,12 15.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_1.xml b/packages/SettingsLib/res/drawable/ic_wifi_1.xml
-index e170f1dadc94..8d969c17c026 100644
+index 9c661f4b5d7a..94cbb4777b15 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_1.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_1.xml
 @@ -1,36 +1,31 @@
 -<!--
--     Copyright (C) 2023 The Android Open Source Project
+-     Copyright (C) 2025 The Android Open Source Project
 -
 -     Licensed under the Apache License, Version 2.0 (the "License");
 -     you may not use this file except in compliance with the License.
@@ -374,121 +408,156 @@ index e170f1dadc94..8d969c17c026 100644
 -     See the License for the specific language governing permissions and
 -     limitations under the License.
 --->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="17.0dp"
+-    android:height="12.58dp"
+-    android:viewportHeight="12.0"
+-    android:viewportWidth="16.21">
+-
+-    <path
+-        android:fillAlpha="0.45"
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="18dp"
--        android:height="13dp"
--        android:viewportWidth="18.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.523,3.314C0.32,3.502 0.32,3.819 0.516,4.015L1.223,4.722C1.418,4.917 1.734,4.916 1.938,4.73C5.936,1.09 12.066,1.09 16.064,4.73C16.268,4.916 16.584,4.917 16.779,4.722L17.486,4.015C17.682,3.819 17.682,3.502 17.479,3.314C12.698,-1.105 5.304,-1.105 0.523,3.314Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M15.011,6.49C15.207,6.294 15.207,5.976 15.002,5.792C11.592,2.736 6.411,2.736 3,5.792C2.795,5.976 2.795,6.294 2.991,6.49L3.698,7.197C3.893,7.392 4.209,7.39 4.417,7.209C7.042,4.93 10.96,4.93 13.585,7.209C13.793,7.39 14.109,7.392 14.304,7.197L15.011,6.49Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M5.465,8.964C5.27,8.769 5.269,8.45 5.481,8.273C7.515,6.576 10.487,6.576 12.521,8.273C12.733,8.45 12.732,8.769 12.537,8.964L11.83,9.672C11.634,9.867 11.319,9.863 11.099,9.698C9.859,8.767 8.143,8.767 6.904,9.698C6.683,9.863 6.368,9.867 6.173,9.672L5.465,8.964Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M10.062,11.439C10.257,11.244 10.259,10.92 10.022,10.779C9.395,10.407 8.608,10.407 7.98,10.779C7.743,10.92 7.745,11.244 7.94,11.439L8.647,12.146C8.843,12.342 9.159,12.342 9.355,12.146L10.062,11.439Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M7.7,11.3 a1.3,1.3 0 1 0 2.6,0 a1.3,1.3 0 1 0 -2.6,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-    <path
+-        android:fillAlpha="0.45"
+-        android:fillColor="#000"
+-        android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-
+-    <path
+-        android:fillColor="#000"
+-        android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_1_error.xml b/packages/SettingsLib/res/drawable/ic_wifi_1_error.xml
-index a4d6a5c00b15..abf805bd496a 100644
+index 32a69f5e810c..3a2f8fa58837 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_1_error.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_1_error.xml
-@@ -1,27 +1,37 @@
+@@ -1,51 +1,37 @@
+-<!--
+-     Copyright (C) 2025 The Android Open Source Project
+-
+-     Licensed under the Apache License, Version 2.0 (the "License");
+-     you may not use this file except in compliance with the License.
+-     You may obtain a copy of the License at
+-
+-          http://www.apache.org/licenses/LICENSE-2.0
+-
+-     Unless required by applicable law or agreed to in writing, software
+-     distributed under the License is distributed on an "AS IS" BASIS,
+-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-     See the License for the specific language governing permissions and
+-     limitations under the License.
+--->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="21.0dp"
+-    android:height="15.66dp"
+-    android:viewportHeight="13.5"
+-    android:viewportWidth="18.1">
+-
+-    <group>
+-        <!-- clip-out the circle which will contain the exclamation point (below this group) -->
+-        <clip-path android:pathData="
+-            M0,0
+-            H18.1
+-            V13.5
+-            H0
+-            Z
+-            M15.109,13.5C17.871,13.5 20.109,11.261 20.109,8.5C20.109,5.739 17.871,3.5 15.109,3.5C12.348,3.5 10.109,5.739 10.109,8.5C10.109,11.261 12.348,13.5 15.109,13.5Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-    </group>
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="17dp"
--        android:height="13dp"
--        android:viewportWidth="17.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.146,4.015C-0.05,3.819 -0.05,3.502 0.153,3.314C4.002,-0.244 9.545,-0.937 14.055,1.234C13.339,1.449 12.792,2.053 12.66,2.801C8.998,1.281 4.65,1.924 1.568,4.73C1.364,4.916 1.048,4.917 0.853,4.722L0.146,4.015Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M12.63,4.435C9.406,2.836 5.424,3.288 2.63,5.792C2.424,5.976 2.425,6.294 2.621,6.49L3.328,7.197C3.523,7.392 3.839,7.39 4.047,7.209C6.484,5.094 10.033,4.942 12.63,6.753V4.435Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M5.095,8.964C4.9,8.769 4.899,8.45 5.111,8.273C7.145,6.576 10.117,6.576 12.151,8.273C12.363,8.45 12.362,8.769 12.166,8.964L11.459,9.672C11.264,9.867 10.949,9.863 10.728,9.698C9.489,8.767 7.773,8.767 6.533,9.698C6.313,9.863 5.998,9.867 5.802,9.672L5.095,8.964Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M9.652,10.779C9.889,10.92 9.887,11.244 9.692,11.439L8.984,12.146C8.789,12.342 8.473,12.342 8.277,12.146L7.57,11.439C7.375,11.244 7.373,10.92 7.61,10.779C8.237,10.407 9.024,10.407 9.652,10.779Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M9,5.6 L9,9.8"
 +        android:strokeColor="#000"
 +        android:strokeWidth="1.8"
 +        android:strokeLineCap="round"
 +    />
-     <path
--        android:pathData="M14.63,11.15C14.63,10.598 15.078,10.15 15.63,10.15C16.182,10.15 16.63,10.598 16.63,11.15C16.63,11.703 16.182,12.15 15.63,12.15C15.078,12.15 14.63,11.703 14.63,11.15Z"
--        android:fillColor="#000"/>
--    <path
--        android:pathData="M14.63,3.15C14.63,2.874 14.854,2.65 15.13,2.65H16.13C16.406,2.65 16.63,2.874 16.63,3.15V8.15C16.63,8.427 16.406,8.65 16.13,8.65H15.13C14.854,8.65 14.63,8.427 14.63,8.15V3.15Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M8.05,12.0 a0.95,0.95 0 1 0 1.9,0 a0.95,0.95 0 1 0 -1.9,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M15.109,5C14.699,5 14.359,5.34 14.359,5.75L14.359,8.75C14.359,9.16 14.699,9.5 15.109,9.5C15.519,9.5 15.859,9.16 15.859,8.75L15.859,5.75C15.859,5.34 15.519,5 15.109,5ZM15.109,12C15.519,12 15.859,11.66 15.859,11.25C15.859,10.84 15.519,10.5 15.109,10.5C14.699,10.5 14.359,10.84 14.359,11.25C14.359,11.66 14.699,12 15.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_2.xml b/packages/SettingsLib/res/drawable/ic_wifi_2.xml
-index fc62267ad5b0..adac3c33af4a 100644
+index 02c14e18a95a..06fca1c28632 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_2.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_2.xml
 @@ -1,35 +1,31 @@
 -<!--
--     Copyright (C) 2023 The Android Open Source Project
+-     Copyright (C) 2025 The Android Open Source Project
 -
 -     Licensed under the Apache License, Version 2.0 (the "License");
 -     you may not use this file except in compliance with the License.
@@ -502,119 +571,154 @@ index fc62267ad5b0..adac3c33af4a 100644
 -     See the License for the specific language governing permissions and
 -     limitations under the License.
 --->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="17.0dp"
+-    android:height="12.58dp"
+-    android:viewportHeight="12.0"
+-    android:viewportWidth="16.21">
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="18dp"
--        android:height="13dp"
--        android:viewportWidth="18.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.523,3.314C0.32,3.502 0.32,3.819 0.516,4.015L1.223,4.722C1.418,4.917 1.734,4.916 1.938,4.73C5.936,1.09 12.066,1.09 16.064,4.73C16.268,4.916 16.584,4.917 16.779,4.722L17.486,4.015C17.682,3.819 17.682,3.502 17.479,3.314C12.698,-1.105 5.304,-1.105 0.523,3.314Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M15.011,6.49C15.207,6.294 15.207,5.976 15.002,5.792C11.592,2.736 6.411,2.736 3,5.792C2.795,5.976 2.795,6.294 2.991,6.49L3.698,7.197C3.893,7.392 4.209,7.39 4.417,7.209C7.042,4.93 10.96,4.93 13.585,7.209C13.793,7.39 14.109,7.392 14.304,7.197L15.011,6.49Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M5.465,8.964C5.27,8.769 5.269,8.45 5.481,8.273C7.515,6.576 10.487,6.576 12.521,8.273C12.733,8.45 12.732,8.769 12.537,8.964L11.83,9.672C11.634,9.867 11.319,9.863 11.099,9.698C9.859,8.767 8.143,8.767 6.904,9.698C6.683,9.863 6.368,9.867 6.173,9.672L5.465,8.964Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M10.062,11.439C10.257,11.244 10.259,10.92 10.022,10.779C9.395,10.407 8.608,10.407 7.98,10.779C7.743,10.92 7.745,11.244 7.94,11.439L8.647,12.146C8.843,12.342 9.159,12.342 9.355,12.146L10.062,11.439Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M7.7,11.3 a1.3,1.3 0 1 0 2.6,0 a1.3,1.3 0 1 0 -2.6,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-    <path
+-        android:fillAlpha="0.45"
+-        android:fillColor="#000"
+-        android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-
+-    <path
+-        android:fillColor="#000"
+-        android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_2_error.xml b/packages/SettingsLib/res/drawable/ic_wifi_2_error.xml
-index 65f40eff1ca8..298e5188227b 100644
+index da0aa12de564..285fcff0ef62 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_2_error.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_2_error.xml
-@@ -1,26 +1,37 @@
+@@ -1,50 +1,37 @@
+-<!--
+-     Copyright (C) 2025 The Android Open Source Project
+-
+-     Licensed under the Apache License, Version 2.0 (the "License");
+-     you may not use this file except in compliance with the License.
+-     You may obtain a copy of the License at
+-
+-          http://www.apache.org/licenses/LICENSE-2.0
+-
+-     Unless required by applicable law or agreed to in writing, software
+-     distributed under the License is distributed on an "AS IS" BASIS,
+-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-     See the License for the specific language governing permissions and
+-     limitations under the License.
+--->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="21.0dp"
+-    android:height="15.66dp"
+-    android:viewportHeight="13.5"
+-    android:viewportWidth="18.1">
+-
+-    <group>
+-        <!-- clip-out the circle which will contain the exclamation point (below this group) -->
+-        <clip-path android:pathData="
+-            M0,0
+-            H18.1
+-            V13.5
+-            H0
+-            Z
+-            M15.109,13.5C17.871,13.5 20.109,11.261 20.109,8.5C20.109,5.739 17.871,3.5 15.109,3.5C12.348,3.5 10.109,5.739 10.109,8.5C10.109,11.261 12.348,13.5 15.109,13.5Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-        <path
+-            android:fillAlpha="0.45"
+-            android:fillColor="#000"
+-            android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-    </group>
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="17dp"
--        android:height="13dp"
--        android:viewportWidth="17.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.146,4.015C-0.05,3.819 -0.05,3.502 0.153,3.314C4.002,-0.244 9.545,-0.937 14.055,1.234C13.339,1.449 12.792,2.053 12.66,2.801C8.998,1.281 4.65,1.924 1.568,4.73C1.364,4.916 1.048,4.917 0.853,4.722L0.146,4.015Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M12.63,4.435C9.406,2.836 5.424,3.288 2.63,5.792C2.424,5.976 2.425,6.294 2.621,6.49L3.328,7.197C3.523,7.392 3.839,7.39 4.047,7.209C6.484,5.094 10.033,4.942 12.63,6.753V4.435Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M5.095,8.964C4.9,8.769 4.899,8.45 5.111,8.273C7.145,6.576 10.117,6.576 12.151,8.273C12.363,8.45 12.362,8.769 12.166,8.964L11.459,9.672C11.264,9.867 10.949,9.863 10.728,9.698C9.489,8.767 7.773,8.767 6.533,9.698C6.313,9.863 5.998,9.867 5.802,9.672L5.095,8.964Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="0.4"
 +    />
-     <path
--        android:pathData="M9.652,10.779C9.889,10.92 9.887,11.244 9.692,11.439L8.984,12.146C8.789,12.342 8.473,12.342 8.277,12.146L7.57,11.439C7.375,11.244 7.373,10.92 7.61,10.779C8.237,10.407 9.024,10.407 9.652,10.779Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M9,5.6 L9,9.8"
 +        android:strokeColor="#000"
 +        android:strokeWidth="1.8"
 +        android:strokeLineCap="round"
 +    />
-     <path
--        android:pathData="M14.63,11.15C14.63,10.598 15.078,10.15 15.63,10.15C16.182,10.15 16.63,10.598 16.63,11.15C16.63,11.703 16.182,12.15 15.63,12.15C15.078,12.15 14.63,11.703 14.63,11.15Z"
--        android:fillColor="#000"/>
--    <path
--        android:pathData="M14.63,3.15C14.63,2.874 14.854,2.65 15.13,2.65H16.13C16.406,2.65 16.63,2.874 16.63,3.15V8.15C16.63,8.427 16.406,8.65 16.13,8.65H15.13C14.854,8.65 14.63,8.427 14.63,8.15V3.15Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M8.05,12.0 a0.95,0.95 0 1 0 1.9,0 a0.95,0.95 0 1 0 -1.9,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M15.109,5C14.699,5 14.359,5.34 14.359,5.75L14.359,8.75C14.359,9.16 14.699,9.5 15.109,9.5C15.519,9.5 15.859,9.16 15.859,8.75L15.859,5.75C15.859,5.34 15.519,5 15.109,5ZM15.109,12C15.519,12 15.859,11.66 15.859,11.25C15.859,10.84 15.519,10.5 15.109,10.5C14.699,10.5 14.359,10.84 14.359,11.25C14.359,11.66 14.699,12 15.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_3.xml b/packages/SettingsLib/res/drawable/ic_wifi_3.xml
-index 9079daf922b8..5d50748138a4 100644
+index 6b183aff40f0..fb66f609a1fe 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_3.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_3.xml
 @@ -1,34 +1,31 @@
 -<!--
--     Copyright (C) 2023 The Android Open Source Project
+-     Copyright (C) 2025 The Android Open Source Project
 -
 -     Licensed under the Apache License, Version 2.0 (the "License");
 -     you may not use this file except in compliance with the License.
@@ -628,117 +732,62 @@ index 9079daf922b8..5d50748138a4 100644
 -     See the License for the specific language governing permissions and
 -     limitations under the License.
 --->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="17.0dp"
+-    android:height="12.58dp"
+-    android:viewportHeight="12.0"
+-    android:viewportWidth="16.21">
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="18dp"
--        android:height="13dp"
--        android:viewportWidth="18.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.523,3.314C0.32,3.502 0.32,3.819 0.516,4.015L1.223,4.722C1.418,4.917 1.734,4.916 1.938,4.73C5.936,1.09 12.066,1.09 16.064,4.73C16.268,4.916 16.584,4.917 16.779,4.722L17.486,4.015C17.682,3.819 17.682,3.502 17.479,3.314C12.698,-1.105 5.304,-1.105 0.523,3.314Z"
--        android:fillAlpha="0.24"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M15.011,6.49C15.207,6.294 15.207,5.976 15.002,5.792C11.592,2.736 6.411,2.736 3,5.792C2.795,5.976 2.795,6.294 2.991,6.49L3.698,7.197C3.893,7.392 4.209,7.39 4.417,7.209C7.042,4.93 10.96,4.93 13.585,7.209C13.793,7.39 14.109,7.392 14.304,7.197L15.011,6.49Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M5.465,8.964C5.27,8.769 5.269,8.45 5.481,8.273C7.515,6.576 10.487,6.576 12.521,8.273C12.733,8.45 12.732,8.769 12.537,8.964L11.83,9.672C11.634,9.867 11.319,9.863 11.099,9.698C9.859,8.767 8.143,8.767 6.904,9.698C6.683,9.863 6.368,9.867 6.173,9.672L5.465,8.964Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M10.062,11.439C10.257,11.244 10.259,10.92 10.022,10.779C9.395,10.407 8.608,10.407 7.98,10.779C7.743,10.92 7.745,11.244 7.94,11.439L8.647,12.146C8.843,12.342 9.159,12.342 9.355,12.146L10.062,11.439Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M7.7,11.3 a1.3,1.3 0 1 0 2.6,0 a1.3,1.3 0 1 0 -2.6,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-    <path
+-        android:fillColor="#000"
+-        android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-
+-    <path
+-        android:fillColor="#000"
+-        android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SettingsLib/res/drawable/ic_wifi_3_error.xml b/packages/SettingsLib/res/drawable/ic_wifi_3_error.xml
-index 940781bbb1ca..4a16fbcf97e9 100644
+index c30affad6a80..13aea9e26e8b 100644
 --- a/packages/SettingsLib/res/drawable/ic_wifi_3_error.xml
 +++ b/packages/SettingsLib/res/drawable/ic_wifi_3_error.xml
-@@ -1,25 +1,37 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="17dp"
--        android:height="13dp"
--        android:viewportWidth="17.0"
--        android:viewportHeight="13.0">
-+    android:width="18dp"
-+    android:height="13dp"
-+    android:viewportWidth="18.0"
-+    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.146,4.015C-0.05,3.819 -0.05,3.502 0.153,3.314C4.002,-0.244 9.545,-0.937 14.055,1.234C13.339,1.449 12.792,2.053 12.66,2.801C8.998,1.281 4.65,1.924 1.568,4.73C1.364,4.916 1.048,4.917 0.853,4.722L0.146,4.015Z"
--        android:fillAlpha="0.3"
--        android:fillColor="#000"/>
-+        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M12.63,4.435C9.406,2.836 5.424,3.288 2.63,5.792C2.424,5.976 2.425,6.294 2.621,6.49L3.328,7.197C3.523,7.392 3.839,7.39 4.047,7.209C6.484,5.094 10.033,4.942 12.63,6.753V4.435Z"
--        android:fillColor="#000"/>
-+        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M5.095,8.964C4.9,8.769 4.899,8.45 5.111,8.273C7.145,6.576 10.117,6.576 12.151,8.273C12.363,8.45 12.362,8.769 12.166,8.964L11.459,9.672C11.264,9.867 10.949,9.863 10.728,9.698C9.489,8.767 7.773,8.767 6.533,9.698C6.313,9.863 5.998,9.867 5.802,9.672L5.095,8.964Z"
--        android:fillColor="#000"/>
-+        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M9.652,10.779C9.889,10.92 9.887,11.244 9.692,11.439L8.984,12.146C8.789,12.342 8.473,12.342 8.277,12.146L7.57,11.439C7.375,11.244 7.373,10.92 7.61,10.779C8.237,10.407 9.024,10.407 9.652,10.779Z"
--        android:fillColor="#000"/>
-+        android:pathData="M9,5.6 L9,9.8"
-+        android:strokeColor="#000"
-+        android:strokeWidth="1.8"
-+        android:strokeLineCap="round"
-+    />
-     <path
--        android:pathData="M14.63,11.15C14.63,10.598 15.078,10.15 15.63,10.15C16.182,10.15 16.63,10.598 16.63,11.15C16.63,11.703 16.182,12.15 15.63,12.15C15.078,12.15 14.63,11.703 14.63,11.15Z"
--        android:fillColor="#000"/>
--    <path
--        android:pathData="M14.63,3.15C14.63,2.874 14.854,2.65 15.13,2.65H16.13C16.406,2.65 16.63,2.874 16.63,3.15V8.15C16.63,8.427 16.406,8.65 16.13,8.65H15.13C14.854,8.65 14.63,8.427 14.63,8.15V3.15Z"
--        android:fillColor="#000"/>
-+        android:pathData="M8.05,12.0 a0.95,0.95 0 1 0 1.9,0 a0.95,0.95 0 1 0 -1.9,0 z"
-+        android:fillColor="#000"
-+        android:fillAlpha="1.0"
-+    />
- </vector>
-diff --git a/packages/SettingsLib/res/drawable/ic_wifi_4.xml b/packages/SettingsLib/res/drawable/ic_wifi_4.xml
-index 6185e4a83332..5d50748138a4 100644
---- a/packages/SettingsLib/res/drawable/ic_wifi_4.xml
-+++ b/packages/SettingsLib/res/drawable/ic_wifi_4.xml
-@@ -1,33 +1,31 @@
+@@ -1,49 +1,37 @@
 -<!--
--     Copyright (C) 2023 The Android Open Source Project
+-     Copyright (C) 2025 The Android Open Source Project
 -
 -     Licensed under the Apache License, Version 2.0 (the "License");
 -     you may not use this file except in compliance with the License.
@@ -752,108 +801,76 @@ index 6185e4a83332..5d50748138a4 100644
 -     See the License for the specific language governing permissions and
 -     limitations under the License.
 --->
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="21.0dp"
+-    android:height="15.66dp"
+-    android:viewportHeight="13.5"
+-    android:viewportWidth="18.1">
+-
+-    <group>
+-        <!-- clip-out the circle which will contain the exclamation point (below this group) -->
+-        <clip-path android:pathData="
+-            M0,0
+-            H18.1
+-            V13.5
+-            H0
+-            Z
+-            M15.109,13.5C17.871,13.5 20.109,11.261 20.109,8.5C20.109,5.739 17.871,3.5 15.109,3.5C12.348,3.5 10.109,5.739 10.109,8.5C10.109,11.261 12.348,13.5 15.109,13.5Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M8.109,12C8.938,12 9.609,11.328 9.609,10.5C9.609,9.672 8.938,9 8.109,9C7.281,9 6.609,9.672 6.609,10.5C6.609,11.328 7.281,12 8.109,12Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M12.659,7.45C13.199,6.91 13.149,6.01 12.479,5.64C11.179,4.92 9.689,4.51 8.109,4.51C6.529,4.51 5.029,4.92 3.739,5.64C3.069,6.01 3.019,6.91 3.559,7.45C3.999,7.89 4.699,7.94 5.259,7.66C6.119,7.24 7.089,7 8.109,7C9.129,7 10.099,7.24 10.959,7.66C11.519,7.94 12.219,7.89 12.659,7.45Z" />
+-
+-        <path
+-            android:fillColor="#000"
+-            android:pathData="M15.85,4.26C16.36,3.75 16.34,2.91 15.76,2.49C13.61,0.93 10.97,0 8.11,0C5.25,0 2.61,0.92 0.46,2.49C-0.12,2.91 -0.14,3.75 0.37,4.26C0.84,4.73 1.59,4.75 2.13,4.37C3.83,3.19 5.89,2.5 8.11,2.5C10.33,2.5 12.39,3.19 14.09,4.37C14.63,4.75 15.38,4.73 15.85,4.26Z" />
+-    </group>
+-
+-    <path
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="18dp"
--        android:height="13dp"
--        android:viewportWidth="18.0"
--        android:viewportHeight="13.0">
++ <vector xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:width="18dp"
 +    android:height="13dp"
 +    android:viewportWidth="18.0"
 +    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.523,3.314C0.32,3.502 0.32,3.819 0.516,4.015L1.223,4.722C1.418,4.917 1.734,4.916 1.938,4.73C5.936,1.09 12.066,1.09 16.064,4.73C16.268,4.916 16.584,4.917 16.779,4.722L17.486,4.015C17.682,3.819 17.682,3.502 17.479,3.314C12.698,-1.105 5.304,-1.105 0.523,3.314Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M15.011,6.49C15.207,6.294 15.207,5.976 15.002,5.792C11.592,2.736 6.411,2.736 3,5.792C2.795,5.976 2.795,6.294 2.991,6.49L3.698,7.197C3.893,7.392 4.209,7.39 4.417,7.209C7.042,4.93 10.96,4.93 13.585,7.209C13.793,7.39 14.109,7.392 14.304,7.197L15.011,6.49Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M5.465,8.964C5.27,8.769 5.269,8.45 5.481,8.273C7.515,6.576 10.487,6.576 12.521,8.273C12.733,8.45 12.732,8.769 12.537,8.964L11.83,9.672C11.634,9.867 11.319,9.863 11.099,9.698C9.859,8.767 8.143,8.767 6.904,9.698C6.683,9.863 6.368,9.867 6.173,9.672L5.465,8.964Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
 +        android:strokeColor="#000"
 +        android:strokeWidth="2.3"
 +        android:strokeAlpha="1.0"
 +    />
-     <path
--        android:pathData="M10.062,11.439C10.257,11.244 10.259,10.92 10.022,10.779C9.395,10.407 8.608,10.407 7.98,10.779C7.743,10.92 7.745,11.244 7.94,11.439L8.647,12.146C8.843,12.342 9.159,12.342 9.355,12.146L10.062,11.439Z"
--        android:fillColor="#000"/>
-+        android:pathData="M7.7,11.3 a1.3,1.3 0 1 0 2.6,0 a1.3,1.3 0 1 0 -2.6,0 z"
-+        android:fillColor="#000"
-+        android:fillAlpha="1.0"
-+    />
- </vector>
-diff --git a/packages/SettingsLib/res/drawable/ic_wifi_4_error.xml b/packages/SettingsLib/res/drawable/ic_wifi_4_error.xml
-index 715aaa0982e9..4a16fbcf97e9 100644
---- a/packages/SettingsLib/res/drawable/ic_wifi_4_error.xml
-+++ b/packages/SettingsLib/res/drawable/ic_wifi_4_error.xml
-@@ -1,24 +1,37 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- KitKat UI Project (Phase 2): 4.4 arc-fan wifi glyph -->
- <vector xmlns:android="http://schemas.android.com/apk/res/android"
--        android:width="17dp"
--        android:height="13dp"
--        android:viewportWidth="17.0"
--        android:viewportHeight="13.0">
-+    android:width="18dp"
-+    android:height="13dp"
-+    android:viewportWidth="18.0"
-+    android:viewportHeight="13.0">
-     <path
--        android:pathData="M0.146,4.015C-0.05,3.819 -0.05,3.502 0.153,3.314C4.002,-0.244 9.545,-0.937 14.055,1.234C13.339,1.449 12.792,2.053 12.66,2.801C8.998,1.281 4.65,1.924 1.568,4.73C1.364,4.916 1.048,4.917 0.853,4.722L0.146,4.015Z"
--        android:fillColor="#000"/>
-+        android:pathData="M6.6,10.6 A3.1,3.1 0 0 1 11.4,10.6"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M12.63,4.435C9.406,2.836 5.424,3.288 2.63,5.792C2.424,5.976 2.425,6.294 2.621,6.49L3.328,7.197C3.523,7.392 3.839,7.39 4.047,7.209C6.484,5.094 10.033,4.942 12.63,6.753V4.435Z"
--        android:fillColor="#000"/>
-+        android:pathData="M4.4,8.7 A6,6 0 0 1 13.6,8.7"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M5.095,8.964C4.9,8.769 4.899,8.45 5.111,8.273C7.145,6.576 10.117,6.576 12.151,8.273C12.363,8.45 12.362,8.769 12.166,8.964L11.459,9.672C11.264,9.867 10.949,9.863 10.728,9.698C9.489,8.767 7.773,8.767 6.533,9.698C6.313,9.863 5.998,9.867 5.802,9.672L5.095,8.964Z"
--        android:fillColor="#000"/>
-+        android:pathData="M2.2,6.9 A8.9,8.9 0 0 1 15.8,6.9"
-+        android:strokeColor="#000"
-+        android:strokeWidth="2.3"
-+        android:strokeAlpha="1.0"
-+    />
-     <path
--        android:pathData="M9.652,10.779C9.889,10.92 9.887,11.244 9.692,11.439L8.984,12.146C8.789,12.342 8.473,12.342 8.277,12.146L7.57,11.439C7.375,11.244 7.373,10.92 7.61,10.779C8.237,10.407 9.024,10.407 9.652,10.779Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M9,5.6 L9,9.8"
 +        android:strokeColor="#000"
 +        android:strokeWidth="1.8"
 +        android:strokeLineCap="round"
 +    />
-     <path
--        android:pathData="M14.63,11.15C14.63,10.598 15.078,10.15 15.63,10.15C16.182,10.15 16.63,10.598 16.63,11.15C16.63,11.703 16.182,12.15 15.63,12.15C15.078,12.15 14.63,11.703 14.63,11.15Z"
--        android:fillColor="#000"/>
--    <path
--        android:pathData="M14.63,3.15C14.63,2.874 14.854,2.65 15.13,2.65H16.13C16.406,2.65 16.63,2.874 16.63,3.15V8.15C16.63,8.427 16.406,8.65 16.13,8.65H15.13C14.854,8.65 14.63,8.427 14.63,8.15V3.15Z"
--        android:fillColor="#000"/>
++     <path
 +        android:pathData="M8.05,12.0 a0.95,0.95 0 1 0 1.9,0 a0.95,0.95 0 1 0 -1.9,0 z"
-+        android:fillColor="#000"
+         android:fillColor="#000"
+-        android:pathData="M15.109,5C14.699,5 14.359,5.34 14.359,5.75L14.359,8.75C14.359,9.16 14.699,9.5 15.109,9.5C15.519,9.5 15.859,9.16 15.859,8.75L15.859,5.75C15.859,5.34 15.519,5 15.109,5ZM15.109,12C15.519,12 15.859,11.66 15.859,11.25C15.859,10.84 15.519,10.5 15.109,10.5C14.699,10.5 14.359,10.84 14.359,11.25C14.359,11.66 14.699,12 15.109,12Z" />
+-
+-</vector>
 +        android:fillAlpha="1.0"
 +    />
- </vector>
++ </vector>
 diff --git a/packages/SystemUI/res/drawable/ic_sysbar_back.xml b/packages/SystemUI/res/drawable/ic_sysbar_back.xml
 index 6c34655733ed..31225495c1db 100644
 --- a/packages/SystemUI/res/drawable/ic_sysbar_back.xml
@@ -923,21 +940,6 @@ index 6ff3ec3f47f2..48fb8bd8e0e2 100644
 +        android:fillColor="#00000000"
 +    />
 +</vector>
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ClockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ClockController.java
-index 43956b454475..5fcc9efabdad 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ClockController.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ClockController.java
-@@ -65,8 +65,9 @@ public class ClockController {
-                             Settings.Secure.getString(mContext.getContentResolver(),
-                                     StatusBarIconController.ICON_HIDE_LIST)).contains("clock");
-                 } else if (statusBarClock.equals(uri)) {
-+                    // KitKat UI Project (Phase 2): clock on the right by default
-                     mClockPosition = LineageSettings.System.getInt(mContext.getContentResolver(),
--                            LineageSettings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_LEFT);
-+                            LineageSettings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_RIGHT);
-                 }
-                 updateActiveClock();
-             }
 -- 
 2.53.0
 

@@ -29,13 +29,13 @@ Change-Id: I333d4a1d72d32cfde1229e8ef9d6ecb66bc7520e
 
 diff --git a/app/src/main/res/drawable/ic_launcher_background.xml b/app/src/main/res/drawable/ic_launcher_background.xml
 deleted file mode 100644
-index df2a967..0000000
+index cd84064..0000000
 --- a/app/src/main/res/drawable/ic_launcher_background.xml
 +++ /dev/null
 @@ -1,17 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -52,13 +52,13 @@ index df2a967..0000000
 -</vector>
 diff --git a/app/src/main/res/drawable/ic_launcher_foreground.xml b/app/src/main/res/drawable/ic_launcher_foreground.xml
 deleted file mode 100644
-index ac9c0af..0000000
+index f6d7b2d..0000000
 --- a/app/src/main/res/drawable/ic_launcher_foreground.xml
 +++ /dev/null
 @@ -1,36 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -94,13 +94,13 @@ index ac9c0af..0000000
 -</vector>
 diff --git a/app/src/main/res/drawable/ic_launcher_monochrome.xml b/app/src/main/res/drawable/ic_launcher_monochrome.xml
 deleted file mode 100644
-index 3f0dbfc..0000000
+index 5431e03..0000000
 --- a/app/src/main/res/drawable/ic_launcher_monochrome.xml
 +++ /dev/null
 @@ -1,15 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -115,13 +115,13 @@ index 3f0dbfc..0000000
 -</vector>
 diff --git a/app/src/main/res/mipmap-anydpi/ic_launcher.xml b/app/src/main/res/mipmap-anydpi/ic_launcher.xml
 deleted file mode 100644
-index aa76129..0000000
+index 096c969..0000000
 --- a/app/src/main/res/mipmap-anydpi/ic_launcher.xml
 +++ /dev/null
 @@ -1,10 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">

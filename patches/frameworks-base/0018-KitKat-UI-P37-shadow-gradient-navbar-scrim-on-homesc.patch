@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Sun, 8 Nov 2026 16:21:24 -0600
+Subject: [PATCH 18/19] KitKat UI P37: shadow gradient navbar scrim on
+ homescreen windows
+
+Force translucent navigation on the home window
+(DisplayPolicy.adjustWindowParamsLw) so the launcher draws behind the
+nav bar and the bar renders the 4.4 shadow gradient scrim
+(nav_bar_kitkat_scrim.xml) over the wallpaper instead of an opaque bar.
+The second half of the attempt (BarBackground mOpaque pinned to solid
+translucency) landed in the P35 patch.
+
+Change-Id: I6b4ac25c0fa49c7b2a6d9d43711198bd011aeedb
+---
+ packages/SystemUI/res/values/config.xml.rej      | 16 ----------------
+ .../com/android/server/wm/DisplayPolicy.java     |  8 ++++++++
+ 2 files changed, 8 insertions(+), 16 deletions(-)
+ delete mode 100644 packages/SystemUI/res/values/config.xml.rej
+
+diff --git a/packages/SystemUI/res/values/config.xml.rej b/packages/SystemUI/res/values/config.xml.rej
+deleted file mode 100644
+index c420ed86937c..000000000000
+--- a/packages/SystemUI/res/values/config.xml.rej
++++ /dev/null
+@@ -1,16 +0,0 @@
+-diff a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml	(rejected hunks)
+-@@ -347,7 +347,13 @@
+-          (donor navigation_key_width), distributed start/center/end with
+-          flexible side spacers, instead of weight-stretched buttons. -->
+-     <string name="config_navBarLayout" translatable="false">left[.5W],back[80AC];home[80AC];recent[80AC],right[.5W]</string>
+--    <string name="config_navBarLayoutQuickstep" translatable="false">back[1.7WC];home;menu_ime[1.7WC]</string>
+-+    <!-- KitKat UI Project: 2-button mode reuses the KitKat back/home icons in
+-+         absolute 80dp centered cells (matching config_navBarLayout) with no
+-+         recent button; recents is a swipe up from the home area on
+-+         quickstep-capable launchers. Stock used weighted quickstep cells
+-+         (back[1.7WC];home;menu_ime[1.7WC]). Three gravity groups are
+-+         required: start;center;end. -->
+-+    <string name="config_navBarLayoutQuickstep" translatable="false">left[.5W],back[80AC];home[80AC];right[.5W]</string>
+-     <string name="config_navBarLayoutHandle" translatable="false">back[70AC];home_handle;ime_switcher[70AC]</string>
+- 
+-     <!-- Whether to show a warning notification when device's skin temperature is high. -->
+diff --git a/services/core/java/com/android/server/wm/DisplayPolicy.java b/services/core/java/com/android/server/wm/DisplayPolicy.java
+index 34106a638965..895a12b873fc 100644
+--- a/services/core/java/com/android/server/wm/DisplayPolicy.java
++++ b/services/core/java/com/android/server/wm/DisplayPolicy.java
+@@ -16,6 +16,7 @@
+ 
+ package com.android.server.wm;
+ 
++import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
+ import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
+ import static android.internal.perfetto.protos.Windowmanagerservice.DecorInsetsInfoProto.OVERRIDE_CONFIG_FRAME;
+ import static android.internal.perfetto.protos.Windowmanagerservice.DecorInsetsInfoProto.OVERRIDE_CONFIG_INSETS;
+@@ -1021,6 +1022,13 @@ public class DisplayPolicy {
+      * are modified in-place.
+      */
+     public void adjustWindowParamsLw(WindowState win, WindowManager.LayoutParams attrs) {
++        // KitKat UI Project (P37): force translucent navigation on the home
++        // window so the launcher draws behind the nav bar and the bar renders
++        // the 4.4 shadow gradient scrim (nav_bar_kitkat_scrim.xml) over the
++        // wallpaper instead of an opaque bar.
++        if (win.getActivityType() == ACTIVITY_TYPE_HOME) {
++            attrs.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
++        }
+         switch (attrs.type) {
+             case TYPE_SYSTEM_OVERLAY:
+             case TYPE_SECURE_SYSTEM_OVERLAY:
+-- 
+2.53.0
+

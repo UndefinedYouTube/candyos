@@ -21,7 +21,7 @@ Change-Id: Ica5318b54b58b3b02d8d230f3b5d272e376fe715
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/PermissionController/res/values/themes.xml b/PermissionController/res/values/themes.xml
-index 4f59ec29d..da6344ca7 100644
+index d83d10f179..a1bae40b5d 100644
 --- a/PermissionController/res/values/themes.xml
 +++ b/PermissionController/res/values/themes.xml
 @@ -48,8 +48,14 @@

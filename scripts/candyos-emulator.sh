@@ -27,7 +27,7 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-TARGET=lineage_sdk_phone_x86_64-ap4a-userdebug
+TARGET=lineage_sdk_phone_x86_64-aosp_current-userdebug
 EMUDIR=/tmp/opencode/android-emulator
 EMUWORK=/tmp/opencode/emu-work
 LOG=/tmp/opencode/emulator.log

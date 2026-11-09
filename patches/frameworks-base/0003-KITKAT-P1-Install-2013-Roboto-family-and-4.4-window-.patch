@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Tue, 20 Oct 2026 14:14:29 -0500
-Subject: [PATCH 02/20] KITKAT-P1: Install 2013 Roboto family and 4.4 window
+Date: Sun, 8 Nov 2026 16:07:36 -0600
+Subject: [PATCH 03/19] KITKAT-P1: Install 2013 Roboto family and 4.4 window
  animations
 
 - 12 TTFs from android-4.4.4_r1 installed as Roboto2013-* prebuilt fonts;
@@ -12,6 +12,8 @@ Subject: [PATCH 02/20] KITKAT-P1: Install 2013 Roboto family and 4.4 window
 - 98 KitKat animation files installed over their modern counterparts
   (activity open/close, task, dialog, toast, submenu, wallpaper, IME,
   screen rotation set); all resource references verified to resolve
+
+Change-Id: I7cc0f14f547647cf7c8af12e7b0903e45d3e8f0d
 ---
  core/res/res/anim/activity_close_enter.xml    |  39 +---
  core/res/res/anim/activity_close_exit.xml     |  47 ++---
@@ -49,11 +51,8 @@ Subject: [PATCH 02/20] KITKAT-P1: Install 2013 Roboto family and 4.4 window
  data/fonts/Roboto2013-Regular.ttf             | Bin 0 -> 114976 bytes
  data/fonts/Roboto2013-Thin.ttf                | Bin 0 -> 115632 bytes
  data/fonts/Roboto2013-ThinItalic.ttf          | Bin 0 -> 119376 bytes
- data/fonts/font_fallback.xml                  |  24 ++-
- data/fonts/font_fallback_cjkvf.xml            |  24 ++-
  data/fonts/fonts.xml                          | 198 ++----------------
- data/fonts/fonts_cjkvf.xml                    | 198 ++----------------
- 40 files changed, 457 insertions(+), 733 deletions(-)
+ 37 files changed, 406 insertions(+), 538 deletions(-)
  create mode 100644 data/fonts/Roboto2013-Bold.ttf
  create mode 100644 data/fonts/Roboto2013-BoldItalic.ttf
  create mode 100644 data/fonts/Roboto2013-Condensed-Bold.ttf
@@ -966,13 +965,13 @@ index c56efa37d3ac..981923ac4723 100644
  </set>
 \ No newline at end of file
 diff --git a/core/res/res/anim/wallpaper_close_exit.xml b/core/res/res/anim/wallpaper_close_exit.xml
-index 9376876e4c92..a91eb49c0e61 100644
+index 78fce2a03baa..1b5fd06d53a0 100644
 --- a/core/res/res/anim/wallpaper_close_exit.xml
 +++ b/core/res/res/anim/wallpaper_close_exit.xml
 @@ -20,5 +20,5 @@
  <set xmlns:android="http://schemas.android.com/apk/res/android"
          android:detachWallpaper="true" android:shareInterpolator="false" android:zAdjustment="normal">
-     <alpha android:fromAlpha="1.0" android:toAlpha="1.0"
+     <alpha android:fromAlpha="1.0" android:toAlpha="0.0"
 -            android:duration="275" />
 +            android:duration="300" />
  </set>
@@ -1015,7 +1014,7 @@ index 955663fa48e9..b0f97d166c8a 100644
  </set>
 \ No newline at end of file
 diff --git a/data/fonts/Android.bp b/data/fonts/Android.bp
-index f1a6b6974b06..2750b879ab06 100644
+index 0380beb6e87e..c5b81d6e7456 100644
 --- a/data/fonts/Android.bp
 +++ b/data/fonts/Android.bp
 @@ -44,6 +44,70 @@ prebuilt_font {
@@ -16056,322 +16055,10 @@ ppZ#?1jyKr{_JRDKx&nS)?uVJ7MBN#GN4X6=*@$U1QSnw?@IOnSqTT=i
 literal 0
 HcmV?d00001
 
-diff --git a/data/fonts/font_fallback.xml b/data/fonts/font_fallback.xml
-index 15ea15a9b4c1..40b6cd803f0a 100644
---- a/data/fonts/font_fallback.xml
-+++ b/data/fonts/font_fallback.xml
-@@ -88,10 +88,15 @@
- <familyset>
-     <!-- first font is default -->
-     <family name="sans-serif">
--        <font supportedAxes="wght,ital">Roboto-Regular.ttf
--          <axis tag="wdth" stylevalue="100" />
--        </font>
--   </family>
-+        <font weight="100" style="normal">Roboto2013-Thin.ttf</font>
-+        <font weight="100" style="italic">Roboto2013-ThinItalic.ttf</font>
-+        <font weight="300" style="normal">Roboto2013-Light.ttf</font>
-+        <font weight="300" style="italic">Roboto2013-LightItalic.ttf</font>
-+        <font weight="400" style="normal">Roboto2013-Regular.ttf</font>
-+        <font weight="400" style="italic">Roboto2013-Italic.ttf</font>
-+        <font weight="700" style="normal">Roboto2013-Bold.ttf</font>
-+        <font weight="700" style="italic">Roboto2013-BoldItalic.ttf</font>
-+    </family>
- 
- 
-     <!-- Note that aliases must come after the fonts they reference. -->
-@@ -105,13 +110,18 @@
-     <alias name="verdana" to="sans-serif" />
- 
-     <family name="sans-serif-condensed">
--      <font supportedAxes="wght,ital">Roboto-Regular.ttf
--        <axis tag="wdth" stylevalue="75" />
--      </font>
-+      <font weight="400" style="normal">Roboto2013-Condensed-Regular.ttf</font>
-+      <font weight="400" style="italic">Roboto2013-Condensed-Italic.ttf</font>
-+      <font weight="700" style="normal">Roboto2013-Condensed-Bold.ttf</font>
-+      <font weight="700" style="italic">Roboto2013-Condensed-BoldItalic.ttf</font>
-     </family>
-     <alias name="sans-serif-condensed-light" to="sans-serif-condensed" weight="300" />
-     <alias name="sans-serif-condensed-medium" to="sans-serif-condensed" weight="500" />
- 
-+    <family name="kitkat-lock-clock">
-+        <font weight="400" style="normal">Roboto2013-Thin.ttf</font>
-+    </family>
-+
-     <family name="serif">
-         <font weight="400" style="normal" postScriptName="NotoSerif">NotoSerif-Regular.ttf</font>
-         <font weight="700" style="normal">NotoSerif-Bold.ttf</font>
-diff --git a/data/fonts/font_fallback_cjkvf.xml b/data/fonts/font_fallback_cjkvf.xml
-index c1ca67ef456a..753c09051986 100644
---- a/data/fonts/font_fallback_cjkvf.xml
-+++ b/data/fonts/font_fallback_cjkvf.xml
-@@ -88,10 +88,15 @@
- <familyset>
-     <!-- first font is default -->
-     <family name="sans-serif">
--        <font supportedAxes="wght,ital">Roboto-Regular.ttf
--          <axis tag="wdth" stylevalue="100" />
--        </font>
--   </family>
-+        <font weight="100" style="normal">Roboto2013-Thin.ttf</font>
-+        <font weight="100" style="italic">Roboto2013-ThinItalic.ttf</font>
-+        <font weight="300" style="normal">Roboto2013-Light.ttf</font>
-+        <font weight="300" style="italic">Roboto2013-LightItalic.ttf</font>
-+        <font weight="400" style="normal">Roboto2013-Regular.ttf</font>
-+        <font weight="400" style="italic">Roboto2013-Italic.ttf</font>
-+        <font weight="700" style="normal">Roboto2013-Bold.ttf</font>
-+        <font weight="700" style="italic">Roboto2013-BoldItalic.ttf</font>
-+    </family>
- 
- 
-     <!-- Note that aliases must come after the fonts they reference. -->
-@@ -105,13 +110,18 @@
-     <alias name="verdana" to="sans-serif" />
- 
-     <family name="sans-serif-condensed">
--      <font supportedAxes="wght,ital">Roboto-Regular.ttf
--        <axis tag="wdth" stylevalue="75" />
--      </font>
-+      <font weight="400" style="normal">Roboto2013-Condensed-Regular.ttf</font>
-+      <font weight="400" style="italic">Roboto2013-Condensed-Italic.ttf</font>
-+      <font weight="700" style="normal">Roboto2013-Condensed-Bold.ttf</font>
-+      <font weight="700" style="italic">Roboto2013-Condensed-BoldItalic.ttf</font>
-     </family>
-     <alias name="sans-serif-condensed-light" to="sans-serif-condensed" weight="300" />
-     <alias name="sans-serif-condensed-medium" to="sans-serif-condensed" weight="500" />
- 
-+    <family name="kitkat-lock-clock">
-+        <font weight="400" style="normal">Roboto2013-Thin.ttf</font>
-+    </family>
-+
-     <family name="serif">
-         <font weight="400" style="normal" postScriptName="NotoSerif">NotoSerif-Regular.ttf</font>
-         <font weight="700" style="normal">NotoSerif-Bold.ttf</font>
 diff --git a/data/fonts/fonts.xml b/data/fonts/fonts.xml
-index b23f00554bdb..7417bec11105 100644
+index 8cbc3000c250..2f9db80a0ac4 100644
 --- a/data/fonts/fonts.xml
 +++ b/data/fonts/fonts.xml
-@@ -36,97 +36,15 @@
- <familyset version="23">
-     <!-- first font is default -->
-     <family name="sans-serif">
--        <font weight="100" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="100" />
--        </font>
--        <font weight="200" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="200" />
--        </font>
--        <font weight="300" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="300" />
--        </font>
--        <font weight="400" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="400" />
--        </font>
--        <font weight="500" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="500" />
--        </font>
--        <font weight="600" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="600" />
--        </font>
--        <font weight="700" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="700" />
--        </font>
--        <font weight="800" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="800" />
--        </font>
--        <font weight="900" style="normal">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="0" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="900" />
--        </font>
--        <font weight="100" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="100" />
--        </font>
--        <font weight="200" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="200" />
--        </font>
--        <font weight="300" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="300" />
--        </font>
--        <font weight="400" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="400" />
--        </font>
--        <font weight="500" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="500" />
--        </font>
--        <font weight="600" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="600" />
--        </font>
--        <font weight="700" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="700" />
--        </font>
--        <font weight="800" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="800" />
--        </font>
--        <font weight="900" style="italic">Roboto-Regular.ttf
--          <axis tag="ital" stylevalue="1" />
--          <axis tag="wdth" stylevalue="100" />
--          <axis tag="wght" stylevalue="900" />
--        </font>
--   </family>
-+        <font weight="100" style="normal">Roboto2013-Thin.ttf</font>
-+        <font weight="100" style="italic">Roboto2013-ThinItalic.ttf</font>
-+        <font weight="300" style="normal">Roboto2013-Light.ttf</font>
-+        <font weight="300" style="italic">Roboto2013-LightItalic.ttf</font>
-+        <font weight="400" style="normal">Roboto2013-Regular.ttf</font>
-+        <font weight="400" style="italic">Roboto2013-Italic.ttf</font>
-+        <font weight="700" style="normal">Roboto2013-Bold.ttf</font>
-+        <font weight="700" style="italic">Roboto2013-BoldItalic.ttf</font>
-+    </family>
- 
- 
-     <!-- Note that aliases must come after the fonts they reference. -->
-@@ -140,100 +58,18 @@
-     <alias name="verdana" to="sans-serif" />
- 
-     <family name="sans-serif-condensed">
--      <font weight="100" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="100" />
--      </font>
--      <font weight="200" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="200" />
--      </font>
--      <font weight="300" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="300" />
--      </font>
--      <font weight="400" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="400" />
--      </font>
--      <font weight="500" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="500" />
--      </font>
--      <font weight="600" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="600" />
--      </font>
--      <font weight="700" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="700" />
--      </font>
--      <font weight="800" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="800" />
--      </font>
--      <font weight="900" style="normal">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="0" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="900" />
--      </font>
--      <font weight="100" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="100" />
--      </font>
--      <font weight="200" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="200" />
--      </font>
--      <font weight="300" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="300" />
--      </font>
--      <font weight="400" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="400" />
--      </font>
--      <font weight="500" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="500" />
--      </font>
--      <font weight="600" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="600" />
--      </font>
--      <font weight="700" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="700" />
--      </font>
--      <font weight="800" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="800" />
--      </font>
--      <font weight="900" style="italic">Roboto-Regular.ttf
--        <axis tag="ital" stylevalue="1" />
--        <axis tag="wdth" stylevalue="75" />
--        <axis tag="wght" stylevalue="900" />
--      </font>
-+      <font weight="400" style="normal">Roboto2013-Condensed-Regular.ttf</font>
-+      <font weight="400" style="italic">Roboto2013-Condensed-Italic.ttf</font>
-+      <font weight="700" style="normal">Roboto2013-Condensed-Bold.ttf</font>
-+      <font weight="700" style="italic">Roboto2013-Condensed-BoldItalic.ttf</font>
-     </family>
-     <alias name="sans-serif-condensed-light" to="sans-serif-condensed" weight="300" />
-     <alias name="sans-serif-condensed-medium" to="sans-serif-condensed" weight="500" />
- 
-+    <family name="kitkat-lock-clock">
-+        <font weight="400" style="normal">Roboto2013-Thin.ttf</font>
-+    </family>
-+
-     <family name="serif">
-         <font weight="400" style="normal" postScriptName="NotoSerif">NotoSerif-Regular.ttf</font>
-         <font weight="700" style="normal">NotoSerif-Bold.ttf</font>
-diff --git a/data/fonts/fonts_cjkvf.xml b/data/fonts/fonts_cjkvf.xml
-index 1ab71ae270eb..c413d4dfa55a 100644
---- a/data/fonts/fonts_cjkvf.xml
-+++ b/data/fonts/fonts_cjkvf.xml
 @@ -36,97 +36,15 @@
  <familyset version="23">
      <!-- first font is default -->

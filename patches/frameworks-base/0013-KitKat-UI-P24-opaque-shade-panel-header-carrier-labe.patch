@@ -1,52 +1,35 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Wed, 28 Oct 2026 16:45:37 -0500
-Subject: [PATCH 14/20] KitKat UI P24: opaque shade panel/header, carrier label
- anti-pop
+Date: Sun, 8 Nov 2026 16:19:45 -0600
+Subject: [PATCH 13/19] KitKat UI P24: opaque shade panel + header carrier
+ label polish
 
-- 24.1 kitkat_shade_panel_bg (flat #ff161616, P3 palette): donor 4.4
-  status_bar_expanded was an OPAQUE panel riding the PanelView
-  expansion over the wallpaper, never a translucent scrim fade. New
-  kitkat_shade_panel_bg view in the shade container reveals top-down
-  with the expansion fraction (clip rect, no per-frame requestLayout)
-  in NotificationsQSContainerController - GONE outside the unlocked
-  SHADE state so the keyguard shade and its scrims are untouched.
-- 24.2 combined_qs_header: opaque kitkat_shade_header_bg strip on the
-  donor header band - the clock/date/settings/clear-all sat on the
-  wallpaper before; the strip guarantees the contrast the retired
-  translucent pills were faking (P18.5 zeroed the unlocked scrims, so
-  nothing backed the header).
-- 24.3 ic_notify_button_bg: default state transparent, pressed
-  highlight only - donor semantics; the resting translucent overlay
-  read as a tacky pill under the clock, gear and clear-all X. Pill
-  background retired from the clock (was enabled=false, never
-  pressable). Buttons keep the pressed feedback.
-- 24.4 NotificationShadeDepthController: zero shade blur/zoom in the
-  UNLOCKED SHADE state - donor 4.4 had no blur, and the opaque panel
-  hides the blurred window background at full expansion anyway.
-  Keyguard states keep the stock treatment.
-- 24.5 CarrierTextManager: static last-info cache replayed the moment
-  a listener attaches - the telephony recompute lands asynchronously
-  (often mid-shade), which made the carrier label pop in after the
-  shade was already open. Shared by the keyguard label, the shade
-  header carrier group and the shade footer label; the async recompute
-  still corrects SIM-state changes.
-- 24.6 ShadeCarrierTextController: fade in the first non-empty carrier
-  label (200ms) instead of popping; landed at full alpha when the fade
-  is interrupted by closing the shade.
+- donor 4.4 OPAQUE shade panel: flat #ff161616 surface
+  (kitkat_shade_panel_bg) riding the panel expansion top-down in
+  NotificationsQSContainerController, GONE outside the unlocked shade
+- shade blur and zoom zeroed in the unlocked SHADE state
+  (NotificationShadeDepthController)
+- header band carries the opaque kitkat_shade_header_bg strip; donor
+  ic_notify_button_bg pill retired from the clock
+- CarrierTextManager pushes the cached carrier info (sLastInfo) on
+  listen so the shade label renders instantly
 
-Change-Id: I1af4cee17217479c23466d7557fd09dac197efb9
+los-24 port notes: CarrierTextManager gained satellite-mode plumbing
+upstream (the cached push slots beside it); the shade carrier lives in
+ShadeCarrierTextController. P18.5 scrim references are gone upstream.
+
+Change-Id: Id2e3f405a6b7c8d9e0f1a2b3c4d5e6f708192031
 ---
  .../res/drawable/ic_notify_button_bg.xml      |  9 +++-
  .../res/drawable/kitkat_shade_header_bg.xml   | 26 +++++++++++
  .../res/drawable/kitkat_shade_panel_bg.xml    | 27 +++++++++++
- .../res/layout/combined_qs_header.xml         | 12 ++---
- .../res/layout/status_bar_expanded.xml        | 21 +++++++++
+ .../res/layout/combined_qs_header.xml         |  9 +++-
+ .../res/layout/status_bar_expanded.xml        | 20 +++++++++
  .../android/keyguard/CarrierTextManager.java  | 20 +++++++++
  .../NotificationsQSContainerController.kt     | 45 +++++++++++++++++++
  .../carrier/ShadeCarrierTextController.java   | 36 ++++++++++++++-
- .../NotificationShadeDepthController.kt       | 10 +++++
- 9 files changed, 198 insertions(+), 8 deletions(-)
+ .../NotificationShadeDepthController.kt       |  9 ++++
+ 9 files changed, 196 insertions(+), 5 deletions(-)
  create mode 100644 packages/SystemUI/res/drawable/kitkat_shade_header_bg.xml
  create mode 100644 packages/SystemUI/res/drawable/kitkat_shade_panel_bg.xml
 
@@ -138,7 +121,7 @@ index 000000000000..23a94dac1f5a
 +</shape>
 \ No newline at end of file
 diff --git a/packages/SystemUI/res/layout/combined_qs_header.xml b/packages/SystemUI/res/layout/combined_qs_header.xml
-index 1d7dfd478b09..3104d504ca5b 100644
+index b8ca29dac81c..7add3a497e54 100644
 --- a/packages/SystemUI/res/layout/combined_qs_header.xml
 +++ b/packages/SystemUI/res/layout/combined_qs_header.xml
 @@ -31,6 +31,7 @@ frame when animating QS <-> QQS transition
@@ -149,13 +132,12 @@ index 1d7dfd478b09..3104d504ca5b 100644
      android:theme="@style/Theme.SystemUI.QuickSettings.Header"
      app:layoutDescription="@xml/combined_qs_header_scene">
  
-@@ -91,9 +92,12 @@ frame when animating QS <-> QQS transition
+@@ -91,8 +92,12 @@ frame when animating QS <-> QQS transition
          android:src="@drawable/kitkat_qs_user_avatar" />
  
-     <!-- KitKat UI P20.9: donor header clock+date - the 4.4
--         status_bar_expanded_header put clock and date inside a
--         non-pressable ic_notify_button_bg pill (enabled=false) with the
--         donor Expanded.Clock/.Date typography. -->
+ <!-- KitKat UI P20.9: donor header clock+date - the 4.4
+-         status_bar_expanded_header put clock and date side by side with
+-         the donor Expanded.Clock/.Date typography. -->
 +         status_bar_expanded_header clock/date with the donor
 +         Expanded.Clock/.Date typography. P24: the header band carries the
 +         opaque kitkat_shade_header_bg strip now, so the donor
@@ -165,30 +147,20 @@ index 1d7dfd478b09..3104d504ca5b 100644
      <com.android.systemui.statusbar.policy.Clock
          android:id="@+id/clock"
          android:layout_width="wrap_content"
-@@ -101,8 +105,6 @@ frame when animating QS <-> QQS transition
-         android:gravity="start|center_vertical"
-         android:paddingStart="8dp"
-         android:paddingEnd="8dp"
--        android:background="@drawable/ic_notify_button_bg"
--        android:enabled="false"
-         android:singleLine="true"
-         android:textDirection="locale"
-         android:textAppearance="@style/TextAppearance.StatusBar.Expanded.Clock"
 diff --git a/packages/SystemUI/res/layout/status_bar_expanded.xml b/packages/SystemUI/res/layout/status_bar_expanded.xml
-index 0f7663a3f8a6..17a8b85f2324 100644
+index 51c706efae34..ebe450e4c714 100644
 --- a/packages/SystemUI/res/layout/status_bar_expanded.xml
 +++ b/packages/SystemUI/res/layout/status_bar_expanded.xml
-@@ -53,6 +53,27 @@
+@@ -42,6 +42,26 @@
  
          <include layout="@layout/dock_info_overlay"/>
  
 +        <!-- KitKat UI Project (P24): donor 4.4 OPAQUE shade panel. The
-+             modern shade rides the wallpaper with transparent scrims
-+             (P18.5 zeroes the UNLOCKED scrim alphas), which left the
-+             notifications unreadable over bright wallpapers. This flat
-+             #ff161616 (P3 palette) surface rides the panel expansion
-+             top-down in NotificationsQSContainerController - GONE
-+             outside the unlocked shade so the keyguard shade and its
++             modern shade rides the wallpaper with transparent scrims,
++             which left the notifications unreadable over bright
++             wallpapers. This flat #ff161616 surface rides the panel
++             expansion top-down in NotificationsQSContainerController -
++             GONE outside the unlocked shade so the keyguard shade and its
 +             scrims are untouched. First child so every other view
 +             (QS frame, notification stack, header stub, carrier label,
 +             drag handle) draws above it. -->
@@ -205,12 +177,12 @@ index 0f7663a3f8a6..17a8b85f2324 100644
 +
          <FrameLayout
              android:id="@+id/qs_frame"
-             android:layout="@layout/qs_panel"
+             android:layout_width="0dp"
 diff --git a/packages/SystemUI/src/com/android/keyguard/CarrierTextManager.java b/packages/SystemUI/src/com/android/keyguard/CarrierTextManager.java
-index b9b8fbe9637f..31e689ce40a4 100644
+index b0c0f19714d1..110e0e2ca128 100644
 --- a/packages/SystemUI/src/com/android/keyguard/CarrierTextManager.java
 +++ b/packages/SystemUI/src/com/android/keyguard/CarrierTextManager.java
-@@ -66,6 +66,17 @@ public class CarrierTextManager {
+@@ -72,6 +72,17 @@ public class CarrierTextManager {
      private static final boolean DEBUG = KeyguardConstants.DEBUG;
      private static final String TAG = "CarrierTextController";
  
@@ -228,10 +200,10 @@ index b9b8fbe9637f..31e689ce40a4 100644
      private final boolean mIsEmergencyCallCapable;
      private final Executor mMainExecutor;
      private final Executor mBgExecutor;
-@@ -282,6 +293,14 @@ public class CarrierTextManager {
-                     mWakefulnessLifecycle.addObserver(mWakefulnessObserver);
-                 });
-                 mTelephonyListenerManager.addActiveDataSubscriptionIdListener(mPhoneStateListener);
+@@ -305,6 +316,14 @@ public class CarrierTextManager {
+                     mJavaAdapter.alwaysCollectFlow(
+                         mDeviceBasedSatelliteViewModel.getCarrierText(),
+                         this::onSatelliteCarrierTextChanged);
 +                // KitKat UI Project (P24): render the cached carrier info
 +                // immediately (see sLastInfo) instead of waiting for the
 +                // telephony recompute - prevents the label popping in
@@ -243,7 +215,7 @@ index b9b8fbe9637f..31e689ce40a4 100644
              } else {
                  // Don't listen and clear out the text when the device isn't a phone.
                  mMainExecutor.execute(() -> callback.updateCarrierInfo(
-@@ -424,6 +443,7 @@ public class CarrierTextManager {
+@@ -470,6 +489,7 @@ public class CarrierTextManager {
  
      @VisibleForTesting
      protected void postToCallback(CarrierTextCallbackInfo info) {
@@ -252,7 +224,7 @@ index b9b8fbe9637f..31e689ce40a4 100644
          if (callback != null) {
              mMainExecutor.execute(() -> callback.updateCarrierInfo(info));
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
-index 930baf1b4479..98eb024ebdf1 100644
+index 8a3fc0b5cff9..d39c9d7bb816 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
 @@ -16,6 +16,7 @@
@@ -263,7 +235,7 @@ index 930baf1b4479..98eb024ebdf1 100644
  import android.view.View
  import android.view.ViewGroup
  import android.view.WindowInsets
-@@ -90,11 +91,53 @@ class NotificationsQSContainerController @Inject constructor(
+@@ -88,11 +89,53 @@ constructor(
          mView.findViewById<View>(R.id.shade_bottom_handle)
      }
  
@@ -317,7 +289,7 @@ index 930baf1b4479..98eb024ebdf1 100644
              }
          }
  
-@@ -106,6 +149,8 @@ class NotificationsQSContainerController @Inject constructor(
+@@ -104,6 +147,8 @@ constructor(
      // grabber), rising to the panel bottom as the shade fully opens.
      private val shadeBottomHandleExpansionListener =
          ShadeExpansionListener { event: ShadeExpansionChangeEvent ->
@@ -391,18 +363,10 @@ index e994c47ccc08..bfb4c910ff21 100644
  }
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
-index ceba80b1e095..5a8b7633a9b7 100644
+index 048f3e8cd12f..0874e313f412 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
-@@ -40,6 +40,7 @@ import com.android.systemui.dump.DumpManager
- import com.android.systemui.plugins.statusbar.StatusBarStateController
- import com.android.systemui.shade.ShadeExpansionChangeEvent
- import com.android.systemui.shade.ShadeExpansionListener
-+import com.android.systemui.statusbar.StatusBarState
- import com.android.systemui.statusbar.phone.BiometricUnlockController
- import com.android.systemui.statusbar.phone.BiometricUnlockController.MODE_WAKE_AND_UNLOCK
- import com.android.systemui.statusbar.phone.DozeParameters
-@@ -191,6 +192,15 @@ class NotificationShadeDepthController @Inject constructor(
+@@ -256,6 +256,15 @@ constructor(
          }
  
      private fun computeBlurAndZoomOut(): Pair<Int, Float> {
@@ -415,9 +379,9 @@ index ceba80b1e095..5a8b7633a9b7 100644
 +        if (statusBarStateController.state == StatusBarState.SHADE) {
 +            return Pair(0, 0f)
 +        }
-         val animationRadius = MathUtils.constrain(shadeAnimation.radius,
-                 blurUtils.minBlurRadius.toFloat(), blurUtils.maxBlurRadius.toFloat())
-         val expansionRadius = blurUtils.blurRadiusOfRatio(
+         val animationRadius =
+             MathUtils.constrain(
+                 shadeAnimation.radius,
 -- 
 2.53.0
 

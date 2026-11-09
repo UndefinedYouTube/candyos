@@ -29,13 +29,13 @@ Change-Id: I4bc1d3019f7fb1f4cd4679b4fd76d8ae44782744
 
 diff --git a/res/drawable/ic_launcher_background.xml b/res/drawable/ic_launcher_background.xml
 deleted file mode 100644
-index f8e688f..0000000
+index dea1b72..0000000
 --- a/res/drawable/ic_launcher_background.xml
 +++ /dev/null
 @@ -1,24 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -59,13 +59,13 @@ index f8e688f..0000000
 -</vector>
 diff --git a/res/drawable/ic_launcher_foreground.xml b/res/drawable/ic_launcher_foreground.xml
 deleted file mode 100644
-index 8c63318..0000000
+index 95ac95a..0000000
 --- a/res/drawable/ic_launcher_foreground.xml
 +++ /dev/null
 @@ -1,39 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -104,13 +104,13 @@ index 8c63318..0000000
 -</vector>
 diff --git a/res/drawable/ic_launcher_monochrome.xml b/res/drawable/ic_launcher_monochrome.xml
 deleted file mode 100644
-index 496c30c..0000000
+index d46ca73..0000000
 --- a/res/drawable/ic_launcher_monochrome.xml
 +++ /dev/null
 @@ -1,18 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -128,13 +128,13 @@ index 496c30c..0000000
 -</vector>
 diff --git a/res/mipmap-anydpi/ic_launcher.xml b/res/mipmap-anydpi/ic_launcher.xml
 deleted file mode 100644
-index b58c81f..0000000
+index 2bf186e..0000000
 --- a/res/mipmap-anydpi/ic_launcher.xml
 +++ /dev/null
 @@ -1,10 +0,0 @@
 -<?xml version="1.0" encoding="utf-8"?>
 -<!--
--     SPDX-FileCopyrightText: 2022 The LineageOS Project
+-     SPDX-FileCopyrightText: The LineageOS Project
 -     SPDX-License-Identifier: Apache-2.0
 --->
 -<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">

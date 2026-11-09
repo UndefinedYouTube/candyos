@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Sun, 8 Nov 2026 16:19:11 -0600
+Subject: [PATCH 12/19] CandyOS P23 fix: gate the 4.4 ticker on the live power
+ state
+
+Gate the ticker's device-interactive supplier on
+mPowerManager.isInteractive() instead of mDeviceInteractive - that
+field only flips on wakefulness transitions and stays false on
+displays that are awake from boot (the emulator), silently queueing
+every tick forever.
+
+los-24 port note: lives inside CentralSurfacesImpl.createTicker (see
+the P9/P10 sweep patch).
+
+Change-Id: Ic1d2e3f405a6b7c8d9e0f1a2b3c4d5e6f70819203
+---
+ .../systemui/statusbar/phone/CentralSurfacesImpl.java     | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
+index e04861b702d7..3ecbf6b3bffd 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
+@@ -1188,7 +1188,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+     public Ticker createTicker(PhoneStatusBarView statusBarView) {
+         if (mTicker == null) {
+             mTicker = new Ticker(statusBarView.getContext(), statusBarView,
+-                    mShadeExpansionStateManager, this::isDeviceInteractive);
++                    // KitKat UI Project (P23 fix): gate on the LIVE power
++                    // state, not mDeviceInteractive - that field only
++                    // flips on wakefulness transitions and stays false
++                    // on displays that are awake from boot (the
++                    // emulator), silently queueing every tick forever.
++                    mShadeExpansionStateManager,
++                    () -> mPowerManager.isInteractive());
+             mNotificationListener.addNotificationHandler(
+                     new NotificationListener.NotificationHandler() {
+                         @Override
+-- 
+2.53.0
+

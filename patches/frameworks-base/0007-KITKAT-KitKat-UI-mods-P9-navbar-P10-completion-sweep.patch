@@ -1,27 +1,53 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Wed, 21 Oct 2026 11:59:54 -0500
-Subject: [PATCH 07/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
+Date: Sun, 8 Nov 2026 16:14:44 -0600
+Subject: [PATCH 07/19] KITKAT: KitKat UI mods - P9 navbar, P10 completion
  sweep (framework theme/fonts, SystemUI shade/QS/recents/ticker/navbar,
  Settings icons, hybrid 2013 emoji font, easter egg)
 
+The P9/P10 completion sweep, ported to the lineage-24 tree:
+
+- 4.4 navbar geometry (fixed 80dp buttons, config_navBarLayout) and the
+  4.4 press-glow KeyButtonView (ic_sysbar_highlight, ported from 4.4;
+  KeyButtonView moved to navigationbar/views/buttons upstream)
+- the 4.4 ticker (new Ticker.java, status_bar.xml ticker views), wired
+  through the new HomeStatusBarComponent dagger subcomponent via
+  CentralSurfacesImpl.createTicker
+- KitKat recents: config_recentsComponent -> KitKatRecentsImpl,
+  manifest entry for KitKatRecentsActivity
+- 4.4 easter egg biscuit (PlatLogoActivity KitKatLogoDrawable)
+- fonts.mk: ship the 2013 Roboto family + AndroidEmoji + NotoColorEmoji2013
+- SettingsLib SettingsTheme accent colors pinned to Holo blue (incl. the
+  new v36 resource qualifiers), keyguard PIN/bouncer whites, flat power
+  menu, flat QS/footer chrome, carrier label + drag handle in the shade,
+  status bar default OPAQUE (4.4), monet seed pinned to Holo blue
+
+los-24 port notes: upstream deleted the QS tile view (QSTileViewImpl /
+qs_tile_label.xml - the QS panel moved to Compose) and the brightness
+slider views; those tile/slider restyles are superseded by the P20 QS
+donor rebuild (see the KitKat-UI-P20 patch). quick_settings_num_columns
+no longer exists upstream. ic_sysbar_*.xml vector wrappers were already
+dropped upstream in favor of the donor PNGs.
+
+Change-Id: I7b8c7e1cd1b3f7ba3d4d5e6f708192a3b4c5d6e7
 ---
- .../internal/app/PlatLogoActivity.java        |  56 +++-
+ .../internal/app/PlatLogoActivity.java        |  57 +++-
  .../res/res/values/colors_device_defaults.xml |   7 +-
  data/fonts/Android.bp                         |  20 ++
  data/fonts/AndroidEmoji.ttf                   | Bin 0 -> 2748 bytes
  data/fonts/NotoColorEmoji2013.ttf             | Bin 0 -> 3328320 bytes
- data/fonts/font_fallback.xml                  |  12 +
  data/fonts/fonts.mk                           |  14 +
  data/fonts/fonts.xml                          |  12 +
  .../res/values-night-v31/colors.xml           |   4 +-
  .../res/values-night-v34/colors.xml           |  11 +-
+ .../res/values-night-v36/colors.xml           |   8 +-
  .../SettingsTheme/res/values-v31/colors.xml   |  22 +-
  .../SettingsTheme/res/values-v31/styles.xml   |   4 +
  .../SettingsTheme/res/values-v34/colors.xml   |  11 +-
+ .../SettingsTheme/res/values-v36/colors.xml   |   8 +-
  .../SettingsTheme/res/values/styles.xml       |   5 +-
  packages/SystemUI/AndroidManifest.xml         |   8 +
- .../SystemUI/res-keyguard/values/styles.xml   |  10 +-
+ .../SystemUI/res-keyguard/values/styles.xml   |   8 +-
  .../res/drawable-hdpi/ic_sysbar_back.png      | Bin 0 -> 2157 bytes
  .../res/drawable-hdpi/ic_sysbar_back_land.png | Bin 0 -> 2195 bytes
  .../res/drawable-hdpi/ic_sysbar_highlight.png | Bin 0 -> 3270 bytes
@@ -50,7 +76,7 @@ Subject: [PATCH 07/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
  .../res/drawable-xxhdpi/ic_sysbar_home.png    | Bin 0 -> 2229 bytes
  .../drawable-xxhdpi/ic_sysbar_home_land.png   | Bin 0 -> 2323 bytes
  .../res/drawable-xxhdpi/ic_sysbar_recent.png  | Bin 0 -> 1517 bytes
- .../drawable/global_actions_lite_button.xml   |  20 +-
+ .../drawable/global_actions_lite_button.xml   |  49 +--
  .../SystemUI/res/drawable/ic_sysbar_back.xml  |  32 --
  .../SystemUI/res/drawable/ic_sysbar_home.xml  |  31 --
  .../res/drawable/ic_sysbar_recent.xml         |  31 --
@@ -63,38 +89,32 @@ Subject: [PATCH 07/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
  .../SystemUI/res/drawable/rounded_bg_full.xml |  27 +-
  .../res/drawable/shade_bottom_handle.xml      |  21 ++
  .../res/layout/combined_qs_header.xml         |  30 ++
- .../layout/global_actions_grid_item_lite.xml  |  26 +-
- .../res/layout/global_actions_grid_lite.xml   |   3 +-
- .../SystemUI/res/layout/qs_tile_label.xml     |  11 +-
- .../quick_settings_brightness_dialog.xml      |  15 +-
+ .../layout/global_actions_grid_item_lite.xml  |  30 +-
+ .../res/layout/global_actions_grid_lite.xml   |   2 +-
  packages/SystemUI/res/layout/status_bar.xml   |  53 ++++
  .../res/layout/status_bar_expanded.xml        |  34 +++
- .../layout/status_bar_notification_footer.xml |   3 +-
- packages/SystemUI/res/values/colors.xml       |   7 +-
- packages/SystemUI/res/values/config.xml       |  13 +-
- packages/SystemUI/res/values/dimens.xml       |  19 +-
+ packages/SystemUI/res/values/colors.xml       |   6 +-
+ packages/SystemUI/res/values/config.xml       |   9 +-
+ packages/SystemUI/res/values/dimens.xml       |   9 +-
  packages/SystemUI/res/values/strings.xml      |   8 +
- packages/SystemUI/res/values/styles.xml       |  44 ++-
+ packages/SystemUI/res/values/styles.xml       |  45 ++-
  .../res/xml/large_screen_shade_header.xml     |  21 +-
  packages/SystemUI/res/xml/qqs_header.xml      |  27 +-
  packages/SystemUI/res/xml/qs_header.xml       |  25 +-
- .../navigationbar/buttons/KeyButtonView.java  | 111 ++++++-
- .../systemui/qs/tileimpl/QSTileViewImpl.kt    |  37 +--
+ .../views/buttons/KeyButtonView.java          | 110 ++++++-
  .../recents/KitKatRecentsActivity.java        | 280 ++++++++++++++++++
  .../systemui/recents/KitKatRecentsImpl.java   | 121 ++++++++
  .../systemui/recents/RecentsModule.java       |   6 +
- .../brightness/BrightnessController.java      |  10 +-
- .../BrightnessSliderController.java           |   6 +-
- .../settings/brightness/ToggleSlider.java     |   6 +-
- .../NotificationsQSContainerController.kt     |  33 +++
- .../systemui/shade/ShadeHeaderController.kt   |  31 ++
+ .../NotificationsQSContainerController.kt     |  29 ++
+ .../systemui/shade/ShadeHeaderController.kt   |  30 ++
  .../carrier/ShadeCarrierTextController.java   |  96 ++++++
  .../StatusBarModePerDisplayRepository.kt      |   9 +-
- .../footer/ui/view/FooterView.java            |  25 +-
- .../statusbar/phone/CentralSurfacesImpl.java  |  54 ++++
+ .../footer/ui/view/FooterView.java            |  46 +--
+ .../statusbar/phone/CentralSurfacesImpl.java  |  59 ++++
  .../systemui/statusbar/phone/Ticker.java      | 217 ++++++++++++++
- .../policy/BrightnessMirrorController.java    |   9 +-
- 88 files changed, 1634 insertions(+), 227 deletions(-)
+ .../dagger/HomeStatusBarComponent.java        |  11 +
+ .../fragment/dagger/HomeStatusBarModule.java  |  15 +
+ 83 files changed, 1605 insertions(+), 226 deletions(-)
  create mode 100644 data/fonts/AndroidEmoji.ttf
  create mode 100644 data/fonts/NotoColorEmoji2013.ttf
  create mode 100644 packages/SystemUI/res/drawable-hdpi/ic_sysbar_back.png
@@ -140,18 +160,18 @@ Subject: [PATCH 07/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
  create mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/phone/Ticker.java
 
 diff --git a/core/java/com/android/internal/app/PlatLogoActivity.java b/core/java/com/android/internal/app/PlatLogoActivity.java
-index 71bbccb3d989..4c4e48977d5b 100644
+index fa314d55794a..9ae7884a74a9 100644
 --- a/core/java/com/android/internal/app/PlatLogoActivity.java
 +++ b/core/java/com/android/internal/app/PlatLogoActivity.java
-@@ -32,6 +32,7 @@ import android.graphics.ColorFilter;
- import android.graphics.Paint;
+@@ -38,6 +38,7 @@ import android.graphics.Paint;
+ import android.graphics.Path;
  import android.graphics.PixelFormat;
  import android.graphics.Rect;
 +import android.graphics.RectF;
  import android.graphics.drawable.Drawable;
  import android.os.Bundle;
  import android.os.CombinedVibration;
-@@ -230,7 +231,11 @@ public class PlatLogoActivity extends Activity {
+@@ -238,7 +239,11 @@ public class PlatLogoActivity extends Activity {
          lp.gravity = Gravity.CENTER;
  
          mLogo = new ImageView(this);
@@ -162,9 +182,9 @@ index 71bbccb3d989..4c4e48977d5b 100644
 +        // are kept unchanged.
 +        mLogo.setImageDrawable(new KitKatLogoDrawable());
          mLogo.setOnTouchListener(mTouchListener);
-         mLogo.requestFocus();
-         mLayout.addView(mLogo, lp);
-@@ -392,6 +397,55 @@ public class PlatLogoActivity extends Activity {
+         mLogo.setVisibility(View.GONE);
+ 
+@@ -427,6 +432,56 @@ public class PlatLogoActivity extends Activity {
          super.onStop();
      }
  
@@ -217,9 +237,10 @@ index 71bbccb3d989..4c4e48977d5b 100644
 +        }
 +    }
 +
-     private static class Starfield extends Drawable {
-         private static final int NUM_STARS = 34; // Build.VERSION_CODES.UPSIDE_DOWN_CAKE
++
+     private static final ColorSpace sSrgbExt = ColorSpace.get(ColorSpace.Named.EXTENDED_SRGB);
  
+     private static long packHdrWhite(float value, float alpha) {
 diff --git a/core/res/res/values/colors_device_defaults.xml b/core/res/res/values/colors_device_defaults.xml
 index 4c5a008a3402..f4fb04df71ae 100644
 --- a/core/res/res/values/colors_device_defaults.xml
@@ -239,7 +260,7 @@ index 4c5a008a3402..f4fb04df71ae 100644
      <color name="accent_primary_device_default">@color/system_accent1_100</color>
      <color name="accent_secondary_device_default">@color/system_accent2_100</color>
 diff --git a/data/fonts/Android.bp b/data/fonts/Android.bp
-index 2750b879ab06..eeb33b45d089 100644
+index c5b81d6e7456..fd6ad2aae6f3 100644
 --- a/data/fonts/Android.bp
 +++ b/data/fonts/Android.bp
 @@ -44,6 +44,26 @@ prebuilt_font {
@@ -59657,36 +59678,13 @@ cG43ge34=*YJ4s?@jKutUB$i(yv8Mk206^9DAOHXW
 literal 0
 HcmV?d00001
 
-diff --git a/data/fonts/font_fallback.xml b/data/fonts/font_fallback.xml
-index 40b6cd803f0a..a8c21097fae5 100644
---- a/data/fonts/font_fallback.xml
-+++ b/data/fonts/font_fallback.xml
-@@ -819,6 +819,18 @@
-               postScriptName="NotoSerifCJKjp-Regular">NotoSerifCJK-Regular.ttc
-         </font>
-     </family>
-+    <!-- KitKat UI Project (Phase 8): 4.4 supplemental emoji glyphs, ahead of
-+         NotoColorEmoji so the covered codepoints render as 2013 glyphs. -->
-+    <family lang="und-Zsye">
-+        <font weight="400" style="normal">AndroidEmoji.ttf</font>
-+    </family>
-+    <!-- KitKat UI Project (P10): the full 2013 blob emoji font
-+         (external/noto-fonts @ android-4.4.4_r1), AHEAD of NotoColorEmoji so
-+         every KitKat-era codepoint renders its 2013 glyph; newer emoji and
-+         sequences fall through to the modern font. -->
-+    <family lang="und-Zsye">
-+        <font weight="400" style="normal">NotoColorEmoji2013.ttf</font>
-+    </family>
-     <family lang="und-Zsye">
-         <font weight="400" style="normal">NotoColorEmoji.ttf</font>
-     </family>
 diff --git a/data/fonts/fonts.mk b/data/fonts/fonts.mk
-index 5d1cc666efa4..837388ce59a4 100644
+index 22320e4d50ab..317dbffa4be4 100644
 --- a/data/fonts/fonts.mk
 +++ b/data/fonts/fonts.mk
-@@ -17,5 +17,19 @@
+@@ -16,6 +16,20 @@
+ 
  PRODUCT_PACKAGES := \
-     DroidSansMono.ttf \
      AndroidClock.ttf \
 +    AndroidEmoji.ttf \
 +    Roboto2013-Regular.ttf \
@@ -59704,11 +59702,12 @@ index 5d1cc666efa4..837388ce59a4 100644
 +    NotoColorEmoji2013.ttf \
      font_fallback.xml \
      fonts.xml
+ 
 diff --git a/data/fonts/fonts.xml b/data/fonts/fonts.xml
-index 7417bec11105..64698d3e68c4 100644
+index 2f9db80a0ac4..136cac41add8 100644
 --- a/data/fonts/fonts.xml
 +++ b/data/fonts/fonts.xml
-@@ -1289,6 +1289,18 @@
+@@ -1421,6 +1421,18 @@
      <family lang="und-Zsye" ignore="true">
          <font weight="400" style="normal">NotoColorEmojiLegacy.ttf</font>
      </family>
@@ -59728,29 +59727,29 @@ index 7417bec11105..64698d3e68c4 100644
          <font weight="400" style="normal">NotoColorEmoji.ttf</font>
      </family>
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-night-v31/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-night-v31/colors.xml
-index 5411591d8df6..267571d73b3b 100644
+index 8873116be306..344bad08e2dd 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-night-v31/colors.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-night-v31/colors.xml
-@@ -29,7 +29,7 @@
-     <color name="settingslib_track_off_color">@android:color/system_neutral1_700</color>
+@@ -30,7 +30,7 @@
  
      <!-- Dialog accent color -->
+     <!--Deprecated. After sdk 35 don't use it, using materialColorPrimary-->
 -    <color name="settingslib_dialog_accent">@android:color/system_accent1_100</color>
 +    <color name="settingslib_dialog_accent">@*android:color/holo_blue_light</color>
      <!-- Dialog background color. -->
      <color name="settingslib_dialog_background">@color/settingslib_surface_dark</color>
      <!-- Dialog error color. -->
-@@ -46,7 +46,7 @@
+@@ -49,7 +49,7 @@
  
      <color name="settingslib_text_color_secondary_device_default">@android:color/system_neutral2_200</color>
  
 -    <color name="settingslib_text_color_preference_category_title">@android:color/system_accent1_100</color>
 +    <color name="settingslib_text_color_preference_category_title">@*android:color/holo_blue_light</color>
  
+     <!--Deprecated. After sdk 35, don't use it, using materialColorInverseOnSurface in dark theme	-->
      <color name="settingslib_surface_dark">@android:color/system_neutral1_800</color>
- 
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-night-v34/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-night-v34/colors.xml
-index e3645b55981b..d46ff4cf5bb4 100644
+index 00a1f27c162a..389db5f490f7 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-night-v34/colors.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-night-v34/colors.xml
 @@ -16,23 +16,26 @@
@@ -59784,8 +59783,43 @@ index e3645b55981b..d46ff4cf5bb4 100644
  
      <!-- Material next track off color-->
      <color name="settingslib_track_off_color">@android:color/system_surface_container_highest_dark
+diff --git a/packages/SettingsLib/SettingsTheme/res/values-night-v36/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-night-v36/colors.xml
+index e31e80176625..4a8aeb7d1014 100644
+--- a/packages/SettingsLib/SettingsTheme/res/values-night-v36/colors.xml
++++ b/packages/SettingsLib/SettingsTheme/res/values-night-v36/colors.xml
+@@ -17,7 +17,7 @@
+ 
+ <resources>
+     <!-- Material next state on color-->
+-    <color name="settingslib_state_on_color">@color/settingslib_materialColorPrimaryContainer</color>
++    <color name="settingslib_state_on_color">@*android:color/holo_blue_light</color>
+ 
+     <!-- Material next state off color-->
+     <color name="settingslib_state_off_color">@color/settingslib_materialColorPrimaryContainer</color>
+@@ -32,18 +32,18 @@
+     <color name="settingslib_thumb_off_color">@color/settingslib_materialColorOutline</color>
+ 
+     <!-- Material next track on color-->
+-    <color name="settingslib_track_on_color">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_track_on_color">@*android:color/holo_blue_light</color>
+ 
+     <!-- Material next track off color-->
+     <color name="settingslib_track_off_color">@color/settingslib_materialColorSurfaceContainerHighest</color>
+ 
+     <!-- Dialog text button color. -->
+-    <color name="settingslib_dialog_accent">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_dialog_accent">@*android:color/holo_blue_light</color>
+ 
+     <!-- Dialog background color. -->
+     <color name="settingslib_dialog_background">@color/settingslib_materialColorSurfaceContainerHigh</color>
+ 
+     <color name="settingslib_colorSurfaceHeader">@color/settingslib_materialColorSurfaceVariant</color>
+ 
+-    <color name="settingslib_text_color_preference_category_title">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_text_color_preference_category_title">@*android:color/holo_blue_light</color>
+ </resources>
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-v31/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-v31/colors.xml
-index fe47e858b747..984fb9003fdf 100644
+index e000423784c6..177c1953f789 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-v31/colors.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-v31/colors.xml
 @@ -16,11 +16,15 @@
@@ -59806,7 +59840,7 @@ index fe47e858b747..984fb9003fdf 100644
  
      <!-- Material next thumb disable color-->
      <color name="settingslib_thumb_disabled_color">@android:color/system_neutral2_100</color>
-@@ -29,13 +33,13 @@
+@@ -29,14 +33,14 @@
      <color name="settingslib_thumb_off_color">@android:color/system_neutral2_300</color>
  
      <!-- Material next track on color-->
@@ -59817,32 +59851,36 @@ index fe47e858b747..984fb9003fdf 100644
      <color name="settingslib_track_off_color">@color/settingslib_switch_track_off</color>
  
      <!-- Dialog accent color -->
+     <!--Deprecated. After sdk 35 don't use it, using materialColorPrimary-->
 -    <color name="settingslib_dialog_accent">@android:color/system_accent1_600</color>
 +    <color name="settingslib_dialog_accent">@*android:color/holo_blue_light</color>
      <!-- Dialog background color -->
      <color name="settingslib_dialog_background">@color/settingslib_surface_light</color>
      <!-- Dialog error color. -->
-@@ -45,15 +49,15 @@
- 
+@@ -48,10 +52,10 @@
      <color name="settingslib_colorSurfaceHeader">@android:color/system_neutral1_100</color>
  
+     <!--Deprecated. After sdk 35 don't use it.-->
 -    <color name="settingslib_accent_device_default_dark">@android:color/system_accent1_100</color>
 +    <color name="settingslib_accent_device_default_dark">@*android:color/holo_blue_dark</color>
  
+     <!--Deprecated. After sdk 35 don't use it.-->
 -    <color name="settingslib_accent_device_default_light">@android:color/system_accent1_600</color>
 +    <color name="settingslib_accent_device_default_light">@*android:color/holo_blue_light</color>
  
+     <!--Deprecated. After sdk 35 don't use it.-->
      <color name="settingslib_primary_dark_device_default_settings">@android:color/system_neutral1_900</color>
- 
+@@ -60,7 +64,7 @@
      <color name="settingslib_primary_device_default_settings_light">@android:color/system_neutral1_50</color>
  
+     <!--Deprecated. After sdk 35 don't use it.-->
 -    <color name="settingslib_accent_primary_device_default">@android:color/system_accent1_100</color>
 +    <color name="settingslib_accent_primary_device_default">@*android:color/holo_blue_dark</color>
  
      <!-- copy from accent_primary_variant_light_device_default-->
-     <color name="settingslib_accent_primary_variant">@android:color/system_accent1_600</color>
-@@ -68,7 +72,9 @@
- 
+     <!-- TODO: deprecate it after moving into partner code-->
+@@ -76,7 +80,9 @@
+     <!--Deprecated. After sdk 35 don't use it. using materialColorOnSurfaceVariant-->
      <color name="settingslib_text_color_secondary_device_default">@android:color/system_neutral2_700</color>
  
 -    <color name="settingslib_text_color_preference_category_title">@android:color/system_accent1_600</color>
@@ -59853,7 +59891,7 @@ index fe47e858b747..984fb9003fdf 100644
      <color name="settingslib_ripple_color">?android:attr/colorControlHighlight</color>
  
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
-index f44b16104f99..5dcf8b892d71 100644
+index 44e6fcb48186..896b808ac139 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
 @@ -29,8 +29,12 @@
@@ -59870,7 +59908,7 @@ index f44b16104f99..5dcf8b892d71 100644
  
      <style name="Switch.SettingsLib" parent="@android:style/Widget.Material.CompoundButton.Switch">
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-v34/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-v34/colors.xml
-index fdd96ec78efc..4b8091f7733a 100644
+index 60642e617a81..464e7d3df23c 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-v34/colors.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-v34/colors.xml
 @@ -16,23 +16,26 @@
@@ -59904,6 +59942,44 @@ index fdd96ec78efc..4b8091f7733a 100644
  
      <!-- Material next track off color-->
      <color name="settingslib_track_off_color">@android:color/system_surface_container_highest_light</color>
+diff --git a/packages/SettingsLib/SettingsTheme/res/values-v36/colors.xml b/packages/SettingsLib/SettingsTheme/res/values-v36/colors.xml
+index b1b37b12c572..9906686aea72 100644
+--- a/packages/SettingsLib/SettingsTheme/res/values-v36/colors.xml
++++ b/packages/SettingsLib/SettingsTheme/res/values-v36/colors.xml
+@@ -17,7 +17,7 @@
+ 
+ <resources>
+     <!-- Material next state on color-->
+-    <color name="settingslib_state_on_color">@color/settingslib_materialColorPrimaryContainer</color>
++    <color name="settingslib_state_on_color">@*android:color/holo_blue_light</color>
+ 
+     <!-- Material next state off color-->
+     <color name="settingslib_state_off_color">@color/settingslib_materialColorPrimaryContainer</color>
+@@ -32,13 +32,13 @@
+     <color name="settingslib_thumb_off_color">@color/settingslib_materialColorOutline</color>
+ 
+     <!-- Material next track on color-->
+-    <color name="settingslib_track_on_color">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_track_on_color">@*android:color/holo_blue_light</color>
+ 
+     <!-- Material next track off color-->
+     <color name="settingslib_track_off_color">@color/settingslib_materialColorSurfaceContainerHighest</color>
+ 
+     <!-- Dialog text button color. -->
+-    <color name="settingslib_dialog_accent">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_dialog_accent">@*android:color/holo_blue_light</color>
+ 
+     <!-- Dialog background color. -->
+     <color name="settingslib_dialog_background">@color/settingslib_materialColorSurfaceContainerHigh</color>
+@@ -48,7 +48,7 @@
+ 
+     <color name="settingslib_colorSurfaceHeader">@color/settingslib_materialColorSurfaceVariant</color>
+ 
+-    <color name="settingslib_text_color_preference_category_title">@color/settingslib_materialColorPrimary</color>
++    <color name="settingslib_text_color_preference_category_title">@*android:color/holo_blue_light</color>
+ 
+     <!-- The text color of spinner title -->
+     <color name="settingslib_spinner_title_color">@color/settingslib_materialColorOnPrimaryContainer</color>
 diff --git a/packages/SettingsLib/SettingsTheme/res/values/styles.xml b/packages/SettingsLib/SettingsTheme/res/values/styles.xml
 index af3fc4817c45..094c72d1110d 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values/styles.xml
@@ -59924,12 +60000,12 @@ index af3fc4817c45..094c72d1110d 100644
  
      <style name="TextAppearance.EntityHeaderSummary"
 diff --git a/packages/SystemUI/AndroidManifest.xml b/packages/SystemUI/AndroidManifest.xml
-index f9a0c507804f..97b14c34955d 100644
+index a83e306e053c..d66557a84ec1 100644
 --- a/packages/SystemUI/AndroidManifest.xml
 +++ b/packages/SystemUI/AndroidManifest.xml
-@@ -494,6 +494,14 @@
-                 android:permission="android.permission.BIND_WALLPAPER"
-                 android:exported="true" />
+@@ -615,6 +615,14 @@
+             </meta-data>
+         </service>
  
 +        <!-- KitKat UI Project: 4.4-style recents panel -->
 +        <activity android:name=".recents.KitKatRecentsActivity"
@@ -59943,39 +60019,34 @@ index f9a0c507804f..97b14c34955d 100644
                    android:enabled="false"
                    android:icon="@drawable/tuner"
 diff --git a/packages/SystemUI/res-keyguard/values/styles.xml b/packages/SystemUI/res-keyguard/values/styles.xml
-index c43e394cb97a..7c5353b50f5e 100644
+index b9754b86b5e1..98fe8791af03 100644
 --- a/packages/SystemUI/res-keyguard/values/styles.xml
 +++ b/packages/SystemUI/res-keyguard/values/styles.xml
-@@ -20,16 +20,18 @@
- <resources xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:androidprv="http://schemas.android.com/apk/prv/res/android">
-     <!-- Keyguard PIN pad styles -->
-+    <!-- KitKat UI Project: bouncer/PIN text colors pinned to KitKat whites
-+         (were wallpaper-extracted monet onSurface/onSurfaceVariant) -->
+@@ -23,13 +23,13 @@
      <style name="Keyguard.TextView" parent="@android:style/Widget.DeviceDefault.TextView">
          <item name="android:textSize">@dimen/kg_status_line_font_size</item>
          <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
--        <item name="android:textColor">?androidprv:attr/materialColorOnSurface</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
 +        <item name="android:textColor">#ffffffff</item>
      </style>
      <style name="Keyguard.Bouncer.PrimaryMessage" parent="Theme.SystemUI">
          <item name="android:textSize">18sp</item>
          <item name="android:lineHeight">24dp</item>
          <item name="android:fontFamily">@*android:string/config_headlineFontFamily</item>
--        <item name="android:textColor">?androidprv:attr/materialColorOnSurface</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
 +        <item name="android:textColor">#ffffffff</item>
          <item name="android:singleLine">true</item>
          <item name="android:textAlignment">center</item>
          <item name="android:ellipsize">marquee</item>
-@@ -42,10 +44,10 @@
+@@ -41,10 +41,10 @@
          <item name="android:textAlignment">center</item>
          <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
          <item name="android:ellipsize">end</item>
--        <item name="android:textColor">?androidprv:attr/materialColorOnSurfaceVariant</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
 +        <item name="android:textColor">#ffb3b3b3</item>
      </style>
      <style name="Keyguard.TextView.EmergencyButton" parent="Theme.SystemUI">
--        <item name="android:textColor">?androidprv:attr/materialColorOnTertiaryFixed</item>
+-        <item name="android:textColor">@color/materialColorOnTertiaryFixed</item>
 +        <item name="android:textColor">#ffffffff</item>
          <item name="android:textSize">16sp</item>
          <item name="android:background">@drawable/kg_emergency_button_background</item>
@@ -61577,16 +61648,45 @@ literal 0
 HcmV?d00001
 
 diff --git a/packages/SystemUI/res/drawable/global_actions_lite_button.xml b/packages/SystemUI/res/drawable/global_actions_lite_button.xml
-index b0184e9bc207..0393db3a2fef 100644
+index 4df894ab2f2f..ca35cb3ead52 100644
 --- a/packages/SystemUI/res/drawable/global_actions_lite_button.xml
 +++ b/packages/SystemUI/res/drawable/global_actions_lite_button.xml
-@@ -16,7 +16,19 @@
- * limitations under the License.
- */
+@@ -1,23 +1,32 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!--
+-/*
+-* Copyright 2021, The Android Open Source Project
+-*
+-* Licensed under the Apache License, Version 2.0 (the "License");
+-* you may not use this file except in compliance with the License.
+-* You may obtain a copy of the License at
+-*
+-*     http://www.apache.org/licenses/LICENSE-2.0
+-*
+-* Unless required by applicable law or agreed to in writing, software
+-* distributed under the License is distributed on an "AS IS" BASIS,
+-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-* See the License for the specific language governing permissions and
+-* limitations under the License.
+-*/
++~ Copyright (C) 2021 The Android Open Source Project
++~
++~ Licensed under the Apache License, Version 2.0 (the "License");
++~ you may not use this file except in compliance with the License.
++~ You may obtain a copy of the License at
++~
++~      http://www.apache.org/licenses/LICENSE-2.0
++~
++~ Unless required by applicable law or agreed to in writing, software
++~ distributed under the License is distributed on an "AS IS" BASIS,
++~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++~ See the License for the specific language governing permissions and
++~ limitations under the License.
  -->
 -<shape xmlns:android="http://schemas.android.com/apk/res/android"
+-    xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
 -    android:shape="oval">
--  <solid android:color="@color/global_actions_lite_button_background"/>
+-  <solid android:color="@color/materialColorSurfaceContainerHighest"/>
 -</shape>
 +<!-- KitKat UI Project: transparent at rest (4.4 rows carry no chrome);
 +     Holo blue fill on press. -->
@@ -61604,7 +61704,6 @@ index b0184e9bc207..0393db3a2fef 100644
 +        </shape>
 +    </item>
 +</selector>
-\ No newline at end of file
 diff --git a/packages/SystemUI/res/drawable/ic_sysbar_back.xml b/packages/SystemUI/res/drawable/ic_sysbar_back.xml
 deleted file mode 100644
 index 31225495c1db..000000000000
@@ -61860,10 +61959,10 @@ index 000000000000..c66971c25ecd
 +</shape>
 \ No newline at end of file
 diff --git a/packages/SystemUI/res/drawable/notif_footer_btn_background.xml b/packages/SystemUI/res/drawable/notif_footer_btn_background.xml
-index b9597375c3df..3ab2d5685793 100644
+index 7ffcc53e6df1..0b5eb97f7ea5 100644
 --- a/packages/SystemUI/res/drawable/notif_footer_btn_background.xml
 +++ b/packages/SystemUI/res/drawable/notif_footer_btn_background.xml
-@@ -22,11 +22,13 @@
+@@ -22,14 +22,16 @@
              android:insetBottom="4dp"
              android:insetTop="4dp">
              <shape android:shape="rectangle">
@@ -61874,7 +61973,10 @@ index b9597375c3df..3ab2d5685793 100644
                  <padding
                      android:left="20dp"
                      android:right="20dp" />
--                <solid android:color="?androidprv:attr/materialColorSurfaceContainerHigh" />
+                 <!-- TODO(b/294830092): Update to the blur surface effect color token when
+                                         the resource workaround is resolved and
+                                         notification_shade_blur is enabled. -->
+-                <solid android:color="@color/materialColorSurfaceContainerHigh" />
 +                <solid android:color="#ff2d2d2d" />
              </shape>
          </inset>
@@ -61951,7 +62053,7 @@ index 000000000000..9b5b66f41e5f
 +</shape>
 \ No newline at end of file
 diff --git a/packages/SystemUI/res/layout/combined_qs_header.xml b/packages/SystemUI/res/layout/combined_qs_header.xml
-index beb481ae4ffc..06addf7f3bc7 100644
+index cd3787e59ac1..bcd2ae57582b 100644
 --- a/packages/SystemUI/res/layout/combined_qs_header.xml
 +++ b/packages/SystemUI/res/layout/combined_qs_header.xml
 @@ -76,6 +76,20 @@ frame when animating QS <-> QQS transition
@@ -61975,7 +62077,7 @@ index beb481ae4ffc..06addf7f3bc7 100644
      <com.android.systemui.statusbar.policy.Clock
          android:id="@+id/clock"
          android:layout_width="wrap_content"
-@@ -166,4 +180,20 @@ frame when animating QS <-> QQS transition
+@@ -160,4 +174,20 @@ frame when animating QS <-> QQS transition
  
      </FrameLayout>
  
@@ -61998,10 +62100,10 @@ index beb481ae4ffc..06addf7f3bc7 100644
  </com.android.systemui.util.NoRemeasureMotionLayout>
 \ No newline at end of file
 diff --git a/packages/SystemUI/res/layout/global_actions_grid_item_lite.xml b/packages/SystemUI/res/layout/global_actions_grid_item_lite.xml
-index 8df0ea6d5981..f0bc454f3f9b 100644
+index 85fab9bb4d0d..bd158d8f5dd9 100644
 --- a/packages/SystemUI/res/layout/global_actions_grid_item_lite.xml
 +++ b/packages/SystemUI/res/layout/global_actions_grid_item_lite.xml
-@@ -13,23 +13,25 @@
+@@ -13,24 +13,28 @@
       See the License for the specific language governing permissions and
       limitations under the License.
  -->
@@ -62011,19 +62113,20 @@ index 8df0ea6d5981..f0bc454f3f9b 100644
 +     (see global_actions_lite_button). -->
  <com.android.systemui.globalactions.GlobalActionsItem
      xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
      android:layout_width="match_parent"
 -    android:layout_weight="1"
      android:layout_height="wrap_content"
 -    android:gravity="center"
 -    android:layout_gravity="center"
 -    android:orientation="vertical"
--    android:stateListAnimator="@anim/control_state_list_animator"
+-    android:stateListAnimator="@anim/control_state_list_animator">
 +    android:gravity="center_vertical"
 +    android:layout_gravity="center_vertical"
 +    android:orientation="horizontal"
 +    android:minHeight="48dp"
-     android:clipChildren="false"
-     android:clipToPadding="false">
++    android:clipChildren="false"
++    android:clipToPadding="false">
          <ImageView
              android:id="@*android:id/icon"
 -            android:layout_width="@dimen/global_actions_button_size"
@@ -62034,34 +62137,28 @@ index 8df0ea6d5981..f0bc454f3f9b 100644
 +            android:layout_height="24dp"
 +            android:layout_marginEnd="16dp"
              android:scaleType="centerInside"
-             android:tint="@color/global_actions_lite_text"
-             android:background="@drawable/global_actions_lite_button"
-@@ -41,8 +43,8 @@
+-            android:tint="@color/materialColorOnSurface"
++            android:tint="@color/global_actions_lite_text"
+             android:background="@drawable/global_actions_lite_button"/>
+         <TextView
+             android:id="@*android:id/message"
+@@ -39,8 +43,8 @@
              android:ellipsize="marquee"
              android:marqueeRepeatLimit="marquee_forever"
              android:singleLine="true"
 -            android:textSize="14sp"
 -            android:gravity="center"
+-            android:textColor="@color/materialColorOnSurface"
 +            android:textSize="16sp"
 +            android:gravity="start|center_vertical"
-             android:textColor="@color/global_actions_lite_text"
++            android:textColor="@color/global_actions_lite_text"
              android:textAppearance="?android:attr/textAppearanceSmall" />
--</com.android.systemui.globalactions.GlobalActionsItem>
-+</com.android.systemui.globalactions.GlobalActionsItem>
-\ No newline at end of file
+ </com.android.systemui.globalactions.GlobalActionsItem>
 diff --git a/packages/SystemUI/res/layout/global_actions_grid_lite.xml b/packages/SystemUI/res/layout/global_actions_grid_lite.xml
-index 7962f83ed52e..ee33f2db0a45 100644
+index af7c889b85c5..b24396f4f191 100644
 --- a/packages/SystemUI/res/layout/global_actions_grid_lite.xml
 +++ b/packages/SystemUI/res/layout/global_actions_grid_lite.xml
-@@ -47,6 +47,7 @@
-         android:layoutDirection="ltr"
-         android:clipChildren="false"
-         android:clipToPadding="false">
-+      <!-- KitKat UI Project: single-column list (was a 2-wide icon grid) -->
-       <androidx.constraintlayout.helper.widget.Flow
-           android:id="@+id/list_flow"
-           android:layout_width="match_parent"
-@@ -55,7 +56,7 @@
+@@ -53,7 +53,7 @@
            app:layout_constraintEnd_toEndOf="parent"
            app:layout_constraintTop_toTopOf="parent"
            app:flow_wrapMode="chain"
@@ -62069,93 +62166,13 @@ index 7962f83ed52e..ee33f2db0a45 100644
 +          app:flow_maxElementsWrap="1"
            app:flow_horizontalGap="@dimen/global_actions_lite_padding"
            app:flow_verticalGap="@dimen/global_actions_lite_padding"
-           app:flow_horizontalStyle="packed"
-diff --git a/packages/SystemUI/res/layout/qs_tile_label.xml b/packages/SystemUI/res/layout/qs_tile_label.xml
-index 974cad32f937..ba0468d3926a 100644
---- a/packages/SystemUI/res/layout/qs_tile_label.xml
-+++ b/packages/SystemUI/res/layout/qs_tile_label.xml
-@@ -16,23 +16,22 @@
- -->
- <com.android.systemui.qs.tileimpl.IgnorableChildLinearLayout
-     xmlns:android="http://schemas.android.com/apk/res/android"
--    android:layout_width="0dp"
-+    android:layout_width="match_parent"
-     android:layout_height="wrap_content"
--    android:layout_weight="1"
-     android:clipChildren="false"
-     android:clipToPadding="false"
-     android:orientation="vertical"
--    android:layout_marginStart="@dimen/qs_label_container_margin"
-+    android:layout_marginStart="0dp"
-     android:layout_marginEnd="0dp"
-     android:focusable="false"
-     android:importantForAccessibility="no"
--    android:layout_gravity="center_vertical | start">
-+    android:layout_gravity="center_horizontal">
- 
-     <com.android.systemui.util.DelayableMarqueeTextView
-         android:id="@+id/tile_label"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
--        android:gravity="start"
-+        android:gravity="center_horizontal"
-         android:textDirection="locale"
-         android:ellipsize="marquee"
-         android:marqueeRepeatLimit="1"
-@@ -45,7 +44,7 @@
-         android:id="@+id/app_label"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
--        android:gravity="start"
-+        android:gravity="center_horizontal"
-         android:textDirection="locale"
-         android:ellipsize="marquee"
-         android:marqueeRepeatLimit="1"
-diff --git a/packages/SystemUI/res/layout/quick_settings_brightness_dialog.xml b/packages/SystemUI/res/layout/quick_settings_brightness_dialog.xml
-index 4eca2e6d9177..8698e2598efe 100644
---- a/packages/SystemUI/res/layout/quick_settings_brightness_dialog.xml
-+++ b/packages/SystemUI/res/layout/quick_settings_brightness_dialog.xml
-@@ -13,6 +13,10 @@
-      See the License for the specific language governing permissions and
-      limitations under the License.
- -->
-+    <!-- KitKat UI Project: 4.4-style brightness row - the auto-brightness
-+         toggle is an Holo "Auto" checkbox (btn_check_holo_dark) instead of the
-+         auto icon pair; it keeps the brightness_icon id so QSPanel tuning and
-+         the mirror controller keep working. -->
-     <com.android.systemui.settings.brightness.BrightnessSliderView
-         xmlns:android="http://schemas.android.com/apk/res/android"
-         android:id="@+id/brightness_slider"
-@@ -38,15 +42,18 @@
-             android:clickable="true"
-         />
- 
--        <ImageView
-+        <CheckBox
-             android:id="@+id/brightness_icon"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical"
-             android:layout_marginStart="4dp"
-             android:layout_marginEnd="8dp"
--            android:src="@drawable/ic_qs_brightness_auto_off"
--            android:contentDescription="@null"
-+            android:button="@drawable/kitkat_btn_check"
-+            android:text="@string/quick_settings_brightness_auto"
-+            android:textColor="#ffeeeeee"
-+            android:textSize="14sp"
-+            android:contentDescription="@string/quick_settings_brightness_auto"
-             android:visibility="gone"
-         />
--    </com.android.systemui.settings.brightness.BrightnessSliderView>
-+    </com.android.systemui.settings.brightness.BrightnessSliderView>
-\ No newline at end of file
+           app:flow_horizontalStyle="packed"/>
 diff --git a/packages/SystemUI/res/layout/status_bar.xml b/packages/SystemUI/res/layout/status_bar.xml
-index f739eb63a06c..cd7f0c9a748f 100644
+index 799ac531193c..906cb46cd747 100644
 --- a/packages/SystemUI/res/layout/status_bar.xml
 +++ b/packages/SystemUI/res/layout/status_bar.xml
-@@ -233,4 +233,57 @@
-         />
+@@ -237,4 +237,57 @@
+ 
      </com.android.keyguard.AlphaOptimizedLinearLayout>
  
 +    <!-- KitKat UI Project: the 4.4 ticker. Overlays status_bar_contents while
@@ -62213,10 +62230,10 @@ index f739eb63a06c..cd7f0c9a748f 100644
 +
  </com.android.systemui.statusbar.phone.PhoneStatusBarView>
 diff --git a/packages/SystemUI/res/layout/status_bar_expanded.xml b/packages/SystemUI/res/layout/status_bar_expanded.xml
-index e21466671363..5eeef3eec407 100644
+index 34f81d94e914..77b5a69e9976 100644
 --- a/packages/SystemUI/res/layout/status_bar_expanded.xml
 +++ b/packages/SystemUI/res/layout/status_bar_expanded.xml
-@@ -91,6 +91,40 @@
+@@ -79,6 +79,40 @@
  
          <include layout="@layout/photo_preview_overlay" />
  
@@ -62257,42 +62274,25 @@ index e21466671363..5eeef3eec407 100644
          <include
              layout="@layout/keyguard_status_bar"
              android:visibility="invisible" />
-diff --git a/packages/SystemUI/res/layout/status_bar_notification_footer.xml b/packages/SystemUI/res/layout/status_bar_notification_footer.xml
-index 72424a13d0f1..c2b978ec80ea 100644
---- a/packages/SystemUI/res/layout/status_bar_notification_footer.xml
-+++ b/packages/SystemUI/res/layout/status_bar_notification_footer.xml
-@@ -64,9 +64,10 @@
-                 android:layout_height="48dp"
-                 android:layout_marginTop="12dp"
-                 android:layout_marginEnd="16dp"
-+                app:layout_constrainedWidth="true"
-                 app:layout_constraintEnd_toEndOf="parent"
--                app:layout_constraintTop_toTopOf="parent"
-                 app:layout_constraintStart_toEndOf="@id/manage_text"
-+                app:layout_constraintTop_toTopOf="parent"
-                 android:background="@drawable/notif_footer_btn_background"
-                 android:focusable="true"
-                 android:contentDescription="@string/accessibility_clear_all"
 diff --git a/packages/SystemUI/res/values/colors.xml b/packages/SystemUI/res/values/colors.xml
-index 46364820c5d5..253d5068b133 100644
+index 49e2bebedcdc..a7e3c672fd2f 100644
 --- a/packages/SystemUI/res/values/colors.xml
 +++ b/packages/SystemUI/res/values/colors.xml
-@@ -39,9 +39,10 @@
-     <color name="global_actions_grid_background">#F1F3F4</color>
+@@ -52,7 +52,11 @@
+     <color name="global_actions_grid_background_blur_fallback">@android:color/system_accent1_200</color>
  
      <!-- Colors for Power Menu Lite -->
--    <color name="global_actions_lite_background">#191C18</color>
--    <color name="global_actions_lite_button_background">#303030</color>
--    <color name="global_actions_lite_button_background_focused">#666666</color>
-+    <!-- KitKat UI Project: flat KitKat dark panel (was #191C18 green-tinted) -->
+-    <color name="global_actions_lite_button_background_focused">#808080</color>
++    <!-- KitKat UI Project: flat KitKat dark power menu -->
 +    <color name="global_actions_lite_background">#ff161616</color>
 +    <color name="global_actions_lite_button_background">#00000000</color>
 +    <color name="global_actions_lite_button_background_focused">#ff33b5e5</color>
-     <color name="global_actions_lite_text">#F0F0F0</color>
-     <color name="global_actions_lite_emergency_background">#F85D4D</color>
-     <color name="global_actions_lite_emergency_icon">@color/GM2_grey_900</color>
++    <color name="global_actions_lite_text">#F0F0F0</color>
+     <color name="global_actions_lite_emergency_background">#D8372D</color>
+     <color name="global_actions_lite_emergency_icon">#FFFFFF</color>
+ 
 diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
-index 2124ad9edca9..757895bb4b61 100644
+index 140bb805af52..2599cf13d796 100644
 --- a/packages/SystemUI/res/values/config.xml
 +++ b/packages/SystemUI/res/values/config.xml
 @@ -23,7 +23,9 @@
@@ -62304,20 +62304,9 @@ index 2124ad9edca9..757895bb4b61 100644
 +         (the KitKat launcher has no Quickstep overview proxy). -->
 +    <string name="config_recentsComponent" translatable="false">com.android.systemui.recents.KitKatRecentsImpl</string>
  
-     <!-- Whether or not we show the number in the bar. -->
-     <bool name="config_statusBarShowNumber">false</bool>
-@@ -65,7 +67,9 @@
-     <integer name="quick_qs_panel_max_rows">2</integer>
- 
-     <!-- The number of columns in the QuickSettings -->
--    <integer name="quick_settings_num_columns">2</integer>
-+    <!-- KitKat UI Project (P10): 4.4 phone QS was 3 columns (donor
-+         quick_settings_num_columns) -->
-+    <integer name="quick_settings_num_columns">3</integer>
- 
-     <!-- The number of rows in the QuickSettings -->
-     <integer name="quick_settings_max_rows">4</integer>
-@@ -325,7 +329,10 @@
+     <!-- For how long the lock screen can be on before the display turns off. -->
+     <integer name="config_lockScreenDisplayTimeout">10000</integer>
+@@ -384,7 +386,10 @@
      </string-array>
  
      <!-- Nav bar button default ordering/layout -->
@@ -62326,14 +62315,14 @@ index 2124ad9edca9..757895bb4b61 100644
 +         (donor navigation_key_width), distributed start/center/end with
 +         flexible side spacers, instead of weight-stretched buttons. -->
 +    <string name="config_navBarLayout" translatable="false">left[.5W],back[80AC];home[80AC];recent[80AC],right[.5W]</string>
-     <string name="config_navBarLayoutQuickstep" translatable="false">back[1.7WC];home;menu_ime[1.7WC]</string>
+     <string name="config_navBarLayoutQuickstep" translatable="false">back[1.7WC];home;contextual[1.7WC]</string>
      <string name="config_navBarLayoutHandle" translatable="false">back[70AC];home_handle;ime_switcher[70AC]</string>
  
 diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
-index 7ec859afa0ac..c3b0d32ee504 100644
+index 48dc27416648..d4f680c0cbb9 100644
 --- a/packages/SystemUI/res/values/dimens.xml
 +++ b/packages/SystemUI/res/values/dimens.xml
-@@ -536,6 +536,9 @@
+@@ -600,6 +600,9 @@
      <dimen name="shade_header_system_icons_height">@dimen/large_screen_shade_header_min_height</dimen>
      <dimen name="hover_system_icons_container_padding_start">0dp</dimen>
      <dimen name="hover_system_icons_container_padding_end">0dp</dimen>
@@ -62343,48 +62332,31 @@ index 7ec859afa0ac..c3b0d32ee504 100644
      <dimen name="hover_system_icons_container_padding_top">0dp</dimen>
      <dimen name="hover_system_icons_container_padding_bottom">0dp</dimen>
  
-@@ -644,8 +647,10 @@
+@@ -702,7 +705,8 @@
      <!-- The size of the gesture span needed to activate the "pull" notification expansion -->
      <dimen name="pull_span_min">25dp</dimen>
  
 -    <dimen name="qs_corner_radius">28dp</dimen>
--    <dimen name="qs_tile_height">80dp</dimen>
 +    <!-- KitKat UI Project: square QS chrome (was 28dp pills) -->
 +    <dimen name="qs_corner_radius">2dp</dimen>
-+    <!-- KitKat UI Project (P10): 4.4 QS cell height (donor quick_settings_cell_height) -->
-+    <dimen name="qs_tile_height">110dp</dimen>
      <dimen name="qs_tile_margin_horizontal">8dp</dimen>
      <dimen name="qs_tile_margin_vertical">@dimen/qs_tile_margin_horizontal</dimen>
-     <dimen name="qs_tile_margin_top_bottom">4dp</dimen>
-@@ -672,7 +677,12 @@
-     <dimen name="qs_tiles_page_horizontal_margin">@dimen/notification_side_paddings</dimen>
- 
-     <dimen name="qs_customize_internal_side_paddings">8dp</dimen>
--    <dimen name="qs_icon_size">20dp</dimen>
-+    <!-- KitKat UI Project (P10): 4.4 tile icon size (donor qs_tile_icon_size) -->
-+    <dimen name="qs_icon_size">32dp</dimen>
-+    <!-- KitKat UI Project (P10): 4.4 tile icon margins (donor
-+         qs_tile_margin_above_icon / qs_tile_margin_below_icon) -->
-+    <dimen name="kitkat_qs_tile_margin_above_icon">27dp</dimen>
-+    <dimen name="kitkat_qs_tile_margin_below_icon">17dp</dimen>
-     <dimen name="qs_side_view_size">28dp</dimen>
-     <dimen name="qs_label_container_margin">10dp</dimen>
-     <dimen name="qs_quick_tile_size">60dp</dimen>
-@@ -1025,7 +1035,8 @@
+     <dimen name="qs_brightness_margin_top">8dp</dimen>
+@@ -1115,7 +1119,8 @@
      <!-- Power Menu Lite -->
      <dimen name="global_actions_button_size">96dp</dimen>
      <dimen name="global_actions_button_padding">38dp</dimen>
 -    <dimen name="global_actions_corner_radius">28dp</dimen>
 +    <!-- KitKat UI Project: flat KitKat power menu (was 28dp pill) -->
 +    <dimen name="global_actions_corner_radius">2dp</dimen>
+     <dimen name="global_actions_blur_radius">34dp</dimen>
      <dimen name="global_actions_lite_padding">24dp</dimen>
      <dimen name="global_actions_info_margin">32dp</dimen>
- 
 diff --git a/packages/SystemUI/res/values/strings.xml b/packages/SystemUI/res/values/strings.xml
-index d2b186d9af2c..7c5bd3ba74fe 100644
+index d025a3ff3a9d..c376247087b3 100644
 --- a/packages/SystemUI/res/values/strings.xml
 +++ b/packages/SystemUI/res/values/strings.xml
-@@ -991,6 +991,14 @@
+@@ -1477,6 +1477,14 @@
  
      <!-- Sensor privacy dialog: Button to open system settings [CHAR LIMIT=50] -->
      <string name="sensor_privacy_dialog_open_settings">Open Settings</string>
@@ -62400,28 +62372,10 @@ index d2b186d9af2c..7c5bd3ba74fe 100644
      <!-- Default name for the media device shown in the output switcher when the name is not available [CHAR LIMIT=30] -->
      <string name="media_seamless_other_device">Other device</string>
 diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
-index ce08ca3e43af..8262482b6063 100644
+index cd3198c8edf3..03a87d358d92 100644
 --- a/packages/SystemUI/res/values/styles.xml
 +++ b/packages/SystemUI/res/values/styles.xml
-@@ -156,6 +156,17 @@
- 
-     <style name="TextAppearance.QS.Status.Carriers" />
- 
-+    <!-- KitKat UI Project: shade carrier label (status_bar_expanded.xml).
-+         Deliberately does NOT chain into TextAppearance.QS.Status (whose
-+         ?attr/onSurface only resolves once the fabricated monet overlay is
-+         registered at boot; the shade root inflates eagerly at SystemUI
-+         start, before that). Fixed 4.4 gray, 2013 Roboto via the sans-serif
-+         repoint. -->
-+    <style name="TextAppearance.KitKat.ShadeCarrier" parent="@android:style/TextAppearance.DeviceDefault.Small">
-+        <item name="android:textColor">#ffb3b3b3</item>
-+        <item name="android:textSize">14sp</item>
-+    </style>
-+
-     <style name="TextAppearance.QS.Status.Carriers.NoCarrierText">
-         <item name="android:textColor">?attr/onSurfaceVariant</item>
-     </style>
-@@ -352,7 +363,10 @@
+@@ -456,7 +456,10 @@
          <item name="darkIconTheme">@style/DualToneDarkTheme</item>
          <item name="wallpaperTextColor">@*android:color/primary_text_material_dark</item>
          <item name="wallpaperTextColorSecondary">@*android:color/secondary_text_material_dark</item>
@@ -62433,7 +62387,7 @@ index ce08ca3e43af..8262482b6063 100644
          <item name="android:colorError">@*android:color/error_color_material_dark</item>
          <item name="*android:lockPatternStyle">@style/LockPatternViewStyle</item>
          <item name="lockPatternStyle">@style/LockPatternContainerStyle</item>
-@@ -370,7 +384,8 @@
+@@ -474,7 +477,8 @@
      <style name="Theme.SystemUI.LightWallpaper">
          <item name="wallpaperTextColor">@*android:color/primary_text_material_light</item>
          <item name="wallpaperTextColorSecondary">@*android:color/secondary_text_material_light</item>
@@ -62443,16 +62397,16 @@ index ce08ca3e43af..8262482b6063 100644
          <item name="android:colorError">@*android:color/error_color_material_light</item>
          <item name="shadowRadius">0</item>
  
-@@ -429,12 +444,16 @@
-         <item name="onSurfaceVariant">?androidprv:attr/materialColorOnSurfaceVariant</item>
-         <item name="outline">?androidprv:attr/materialColorOutline</item>
+@@ -533,18 +537,32 @@
+         <item name="onSurfaceVariant">@color/materialColorOnSurfaceVariant</item>
+         <item name="outline">@color/materialColorOutline</item>
  
--        <item name="shadeActive">@color/material_dynamic_primary90</item>
--        <item name="onShadeActive">@color/material_dynamic_primary10</item>
--        <item name="onShadeActiveVariant">@color/material_dynamic_primary30</item>
--        <item name="shadeInactive">@color/material_dynamic_neutral20</item>
--        <item name="onShadeInactive">@color/material_dynamic_neutral90</item>
--        <item name="onShadeInactiveVariant">@color/material_dynamic_neutral_variant80</item>
+-        <item name="shadeActive">@color/customColorShadeActive</item>
+-        <item name="onShadeActive">@color/customColorOnShadeActive</item>
+-        <item name="onShadeActiveVariant">@color/customColorOnShadeActiveVariant</item>
+-        <item name="shadeInactive">@color/customColorShadeInactive</item>
+-        <item name="onShadeInactive">@color/customColorOnShadeInactive</item>
+-        <item name="onShadeInactiveVariant">@color/customColorOnShadeInactiveVariant</item>
 +        <!-- KitKat UI Project: flat 4.4 tile chrome - tiles stay dark in both
 +             states (no monet primary90 light-fill for active), and the
 +             active/inactive distinction moves to white vs gray text and
@@ -62463,10 +62417,26 @@ index ce08ca3e43af..8262482b6063 100644
 +        <item name="shadeInactive">#ff2d2d2d</item>
 +        <item name="onShadeInactive">#ffb3b3b3</item>
 +        <item name="onShadeInactiveVariant">#ff808080</item>
-         <item name="shadeDisabled">@color/shade_disabled</item>
-         <item name="underSurface">@color/material_dynamic_neutral0</item>
+         <item name="shadeDisabled">@color/customColorShadeDisabled</item>
+         <item name="underSurface">@color/customColorUnderSurface</item>
          <item name="android:itemTextAppearance">@style/Control.MenuItem</item>
-@@ -508,6 +527,12 @@
+     </style>
+ 
+     <!-- Cannot double inherit. Use Theme.SystemUI.QuickSettings in code to match -->
++    <!-- KitKat UI Project: shade carrier label (status_bar_expanded.xml).
++         Deliberately does NOT chain into the monet onSurface attributes
++         (they only resolve once the fabricated overlay is registered at
++         boot; the shade root inflates eagerly at SystemUI start, before
++         that). Fixed 4.4 gray, 2013 Roboto via the sans-serif repoint. -->
++    <style name="TextAppearance.KitKat.ShadeCarrier" parent="@android:style/TextAppearance.DeviceDefault.Small">
++        <item name="android:textColor">#ffb3b3b3</item>
++        <item name="android:textSize">14sp</item>
++    </style>
++
+     <style name="BrightnessDialog" parent="@android:style/Theme.DeviceDefault.Dialog">
+         <item name="android:windowBackground">@android:color/transparent</item>
+         <item name="android:windowAnimationStyle">@style/Animation.BrightnessDialog</item>
+@@ -639,6 +657,12 @@
          <item name="android:windowIsFloating">true</item>
      </style>
  
@@ -62479,18 +62449,20 @@ index ce08ca3e43af..8262482b6063 100644
      <style name="Theme.SystemUI.Dialog.GlobalActionsLite" parent="Theme.SystemUI.Dialog">
          <!-- Settings windowFullscreen: true is necessary to be able to intercept touch events -->
          <!-- that would otherwise be intercepted by the Shade. -->
-@@ -684,7 +709,8 @@
-     <style
+@@ -862,8 +886,9 @@
          name="TextAppearance.NotificationFooterButton"
          parent="@android:style/Widget.DeviceDefault.Button.Borderless">
--        <item name="android:textColor">?androidprv:attr/materialColorOnSurface</item>
+         <item name="android:fontFamily">variable-title-medium-emphasized</item>
+-        <item name="android:textColor">@color/materialColorOnSurface</item>
+-        <item name="android:drawableTint">@color/materialColorOnSurface</item>
 +        <!-- KitKat UI Project: flat light-gray footer button text (was monet onSurface) -->
 +        <item name="android:textColor">#ffeeeeee</item>
++        <item name="android:drawableTint">#ffeeeeee</item>
          <item name="android:textAllCaps">false</item>
-         <item name="android:textSize">14sp</item>
+         <item name="android:textSize">16sp</item>
          <item name="android:minWidth">0dp</item>
 diff --git a/packages/SystemUI/res/xml/large_screen_shade_header.xml b/packages/SystemUI/res/xml/large_screen_shade_header.xml
-index fe61c46e341d..b0139fc87502 100644
+index eb0aae9ebcf1..22ad62c6c964 100644
 --- a/packages/SystemUI/res/xml/large_screen_shade_header.xml
 +++ b/packages/SystemUI/res/xml/large_screen_shade_header.xml
 @@ -18,12 +18,22 @@
@@ -62517,7 +62489,7 @@ index fe61c46e341d..b0139fc87502 100644
              app:layout_constraintTop_toTopOf="parent" />
          <PropertySet android:alpha="1" />
      </Constraint>
-@@ -72,4 +82,13 @@
+@@ -73,4 +83,13 @@
              app:layout_constraintEnd_toStartOf="@id/end_guide"
              app:layout_constraintTop_toTopOf="parent" />
      </Constraint>
@@ -62582,7 +62554,7 @@ index 50a388d0fa64..e5b0060cd0bf 100644
  </ConstraintSet>
 \ No newline at end of file
 diff --git a/packages/SystemUI/res/xml/qs_header.xml b/packages/SystemUI/res/xml/qs_header.xml
-index 427fd87c640a..3898daa49ea8 100644
+index f47327c8513e..b1da7e2d531c 100644
 --- a/packages/SystemUI/res/xml/qs_header.xml
 +++ b/packages/SystemUI/res/xml/qs_header.xml
 @@ -33,12 +33,24 @@
@@ -62628,25 +62600,25 @@ index 427fd87c640a..3898daa49ea8 100644
 +
  </ConstraintSet>
 \ No newline at end of file
-diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/buttons/KeyButtonView.java b/packages/SystemUI/src/com/android/systemui/navigationbar/buttons/KeyButtonView.java
-index 1253ce4aab33..6178ae365847 100644
---- a/packages/SystemUI/src/com/android/systemui/navigationbar/buttons/KeyButtonView.java
-+++ b/packages/SystemUI/src/com/android/systemui/navigationbar/buttons/KeyButtonView.java
-@@ -39,6 +39,10 @@ import android.os.SystemClock;
+diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/views/buttons/KeyButtonView.java b/packages/SystemUI/src/com/android/systemui/navigationbar/views/buttons/KeyButtonView.java
+index 559d75f2c54c..04ded7029ee4 100644
+--- a/packages/SystemUI/src/com/android/systemui/navigationbar/views/buttons/KeyButtonView.java
++++ b/packages/SystemUI/src/com/android/systemui/navigationbar/views/buttons/KeyButtonView.java
+@@ -39,6 +39,9 @@ import android.os.Bundle;
+ import android.os.SystemClock;
  import android.util.AttributeSet;
  import android.util.Log;
- import android.util.TypedValue;
 +import android.animation.AnimatorSet;
 +import android.animation.ObjectAnimator;
 +import android.animation.PropertyValuesHolder;
-+import android.graphics.RectF;
+ import android.util.TypedValue;
  import android.view.HapticFeedbackConstants;
  import android.view.InputDevice;
- import android.view.KeyCharacterMap;
-@@ -91,6 +95,18 @@ public class KeyButtonView extends ImageView implements ButtonInterface {
-     private boolean mHasOvalBg = false;
-     private NavBarButtonClickLogger mNavBarButtonClickLogger;
- 
+@@ -81,6 +84,18 @@ public class KeyButtonView extends ImageView implements ButtonInterface {
+     @VisibleForTesting boolean mLongClicked;
+     private OnClickListener mOnClickListener;
+     private final KeyButtonRipple mRipple;
++
 +    // KitKat UI Project (P9): the 4.4 press glow, ported from
 +    // android-4.4.4_r1 frameworks/base SystemUI KeyButtonView. Draws the
 +    // ic_sysbar_highlight glow behind the icon, animating alpha/scale on
@@ -62658,11 +62630,10 @@ index 1253ce4aab33..6178ae365847 100644
 +    private float mGlowAlpha = 0f;
 +    private float mGlowScale = 1f;
 +    private AnimatorSet mGlowAnim;
-+
-     @VisibleForTesting
-     public enum NavBarButtonEvent implements UiEventLogger.UiEventEnum {
- 
-@@ -184,14 +200,107 @@ public class KeyButtonView extends ImageView implements ButtonInterface {
+     private final LauncherProxyService mLauncherProxyService;
+     private final MetricsLogger mMetricsLogger = Dependency.get(MetricsLogger.class);
+     private final InputManagerGlobal mInputManagerGlobal;
+@@ -179,14 +194,107 @@ public class KeyButtonView extends ImageView implements ButtonInterface {
          setClickable(true);
          mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
  
@@ -62677,7 +62648,7 @@ index 1253ce4aab33..6178ae365847 100644
 +            mGlowHeight = 0;
 +        }
          mRipple = new KeyButtonRipple(context, this, R.dimen.key_button_ripple_max_width);
-         mOverviewProxyService = Dependency.get(OverviewProxyService.class);
+         mLauncherProxyService = Dependency.get(LauncherProxyService.class);
          mInputManagerGlobal = manager;
 -        setBackground(mRipple);
 +        setBackground(null);
@@ -62771,75 +62742,6 @@ index 1253ce4aab33..6178ae365847 100644
      @Override
      public boolean isClickable() {
          return mCode != KEYCODE_UNKNOWN || super.isClickable();
-diff --git a/packages/SystemUI/src/com/android/systemui/qs/tileimpl/QSTileViewImpl.kt b/packages/SystemUI/src/com/android/systemui/qs/tileimpl/QSTileViewImpl.kt
-index 9fefcbd86e51..544fd27129d1 100644
---- a/packages/SystemUI/src/com/android/systemui/qs/tileimpl/QSTileViewImpl.kt
-+++ b/packages/SystemUI/src/com/android/systemui/qs/tileimpl/QSTileViewImpl.kt
-@@ -177,8 +177,11 @@ open class QSTileViewImpl @JvmOverloads constructor(
-                     "Theme.SystemUI.QuickSettings")
-         }
-         setId(generateViewId())
--        orientation = LinearLayout.HORIZONTAL
--        gravity = Gravity.CENTER_VERTICAL or Gravity.START
-+        // KitKat UI Project (P10): 4.4 tile layout - vertical, icon centered
-+        // above the centered label (donor quick_settings_tile_basic.xml),
-+        // instead of the modern horizontal icon-start/label-end row.
-+        orientation = LinearLayout.VERTICAL
-+        gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
-         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
-         clipChildren = false
-         clipToPadding = false
-@@ -187,11 +190,16 @@ open class QSTileViewImpl @JvmOverloads constructor(
-         setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
- 
-         val padding = resources.getDimensionPixelSize(R.dimen.qs_tile_padding)
--        val startPadding = resources.getDimensionPixelSize(R.dimen.qs_tile_start_padding)
--        setPaddingRelative(startPadding, padding, padding, padding)
-+        setPaddingRelative(padding, padding, padding, padding)
- 
-         val iconSize = resources.getDimensionPixelSize(R.dimen.qs_icon_size)
--        addView(icon, LayoutParams(iconSize, iconSize))
-+        val iconAbove = resources.getDimensionPixelSize(R.dimen.kitkat_qs_tile_margin_above_icon)
-+        val iconBelow = resources.getDimensionPixelSize(R.dimen.kitkat_qs_tile_margin_below_icon)
-+        addView(icon, LayoutParams(iconSize, iconSize).apply {
-+            gravity = Gravity.CENTER_HORIZONTAL
-+            topMargin = iconAbove
-+            bottomMargin = iconBelow
-+        })
- 
-         createAndAddLabels()
-         createAndAddSideView()
-@@ -222,23 +230,18 @@ open class QSTileViewImpl @JvmOverloads constructor(
-         FontSizeUtils.updateFontSize(secondaryLabel, R.dimen.qs_tile_text_size)
- 
-         val iconSize = context.resources.getDimensionPixelSize(R.dimen.qs_icon_size)
--        icon.layoutParams.apply {
-+        val iconAbove = resources.getDimensionPixelSize(R.dimen.kitkat_qs_tile_margin_above_icon)
-+        val iconBelow = resources.getDimensionPixelSize(R.dimen.kitkat_qs_tile_margin_below_icon)
-+        icon.layoutParams = (icon.layoutParams as LayoutParams).apply {
-             height = iconSize
-             width = iconSize
-+            gravity = Gravity.CENTER_HORIZONTAL
-+            topMargin = iconAbove
-+            bottomMargin = iconBelow
-         }
- 
-         val padding = resources.getDimensionPixelSize(R.dimen.qs_tile_padding)
--        val startPadding = resources.getDimensionPixelSize(R.dimen.qs_tile_start_padding)
--        setPaddingRelative(startPadding, padding, padding, padding)
--
--        val labelMargin = resources.getDimensionPixelSize(R.dimen.qs_label_container_margin)
--        (labelContainer.layoutParams as MarginLayoutParams).apply {
--            marginStart = labelMargin
--        }
--
--        (sideView.layoutParams as MarginLayoutParams).apply {
--            marginStart = labelMargin
--        }
-+        setPaddingRelative(padding, padding, padding, padding)
-         (chevronView.layoutParams as MarginLayoutParams).apply {
-             height = iconSize
-             width = iconSize
 diff --git a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java
 new file mode 100644
 index 000000000000..275e4fd726a9
@@ -63270,128 +63172,19 @@ index 11089173a708..ea467a9d5e4f 100644
 +    @ClassKey(KitKatRecentsImpl.class)
 +    public abstract RecentsImplementation bindKitKatRecentsImpl(KitKatRecentsImpl impl);
  }
-diff --git a/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessController.java b/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessController.java
-index a48da045360c..2679f6595b3f 100644
---- a/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessController.java
-+++ b/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessController.java
-@@ -41,7 +41,7 @@ import android.service.vr.IVrManager;
- import android.service.vr.IVrStateCallbacks;
- import android.util.Log;
- import android.util.MathUtils;
--import android.widget.ImageView;
-+import android.widget.CompoundButton;
- 
- import androidx.annotation.Nullable;
- 
-@@ -76,7 +76,7 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
-     private static final Uri BRIGHTNESS_MODE_URI =
-             Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE);
- 
--    private final ImageView mIcon;
-+    private final CompoundButton mIcon;
-     private final int mDisplayId;
-     private final Context mContext;
-     private final ToggleSlider mControl;
-@@ -406,10 +406,10 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
-     }
- 
-     private void updateIcon(boolean automatic) {
-+        // KitKat UI Project: the auto toggle is the Holo "Auto" checkbox; its
-+        // checked state tracks auto-brightness (was auto on/off icon pair).
-         if (mIcon != null) {
--            mIcon.setImageResource(mAutomatic ?
--                    R.drawable.ic_qs_brightness_auto_on :
--                    R.drawable.ic_qs_brightness_auto_off);
-+            mIcon.setChecked(mAutomatic);
-         }
-     }
- 
-diff --git a/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessSliderController.java b/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessSliderController.java
-index 872bd2e76bb7..9d14f1881d07 100644
---- a/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessSliderController.java
-+++ b/packages/SystemUI/src/com/android/systemui/settings/brightness/BrightnessSliderController.java
-@@ -23,7 +23,7 @@ import android.view.LayoutInflater;
- import android.view.MotionEvent;
- import android.view.View;
- import android.view.ViewGroup;
--import android.widget.ImageView;
-+import android.widget.CompoundButton;
- import android.widget.SeekBar;
- 
- import androidx.annotation.Nullable;
-@@ -57,7 +57,7 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
- 
-     private Listener mListener;
-     private ToggleSlider mMirror;
--    private ImageView mIcon;
-+    private CompoundButton mIcon;
-     private BrightnessMirrorController mMirrorController;
-     private boolean mTracking;
-     private final FalsingManager mFalsingManager;
-@@ -101,7 +101,7 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
-         return mView;
-     }
- 
--    public ImageView getIcon() {
-+    public CompoundButton getIcon() {
-         return mIcon;
-     }
- 
-diff --git a/packages/SystemUI/src/com/android/systemui/settings/brightness/ToggleSlider.java b/packages/SystemUI/src/com/android/systemui/settings/brightness/ToggleSlider.java
-index 0789b8180483..f8bb41112c89 100644
---- a/packages/SystemUI/src/com/android/systemui/settings/brightness/ToggleSlider.java
-+++ b/packages/SystemUI/src/com/android/systemui/settings/brightness/ToggleSlider.java
-@@ -17,7 +17,7 @@
- package com.android.systemui.settings.brightness;
- 
- import android.view.MotionEvent;
--import android.widget.ImageView;
-+import android.widget.CompoundButton;
- 
- import com.android.settingslib.RestrictedLockUtils;
- import com.android.systemui.statusbar.policy.BrightnessMirrorController;
-@@ -41,5 +41,7 @@ public interface ToggleSlider {
-     void hideView();
-     boolean isVisible();
- 
--    ImageView getIcon();
-+    // KitKat UI Project: the auto-brightness toggle is an Holo "Auto" checkbox
-+    // (was an auto on/off ImageView).
-+    CompoundButton getIcon();
- }
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
-index 29de688fa7bf..78bc0bd537b5 100644
+index 9929b7979745..d572c229070a 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
-@@ -29,6 +29,7 @@ import androidx.constraintlayout.widget.ConstraintSet.TOP
- import androidx.lifecycle.lifecycleScope
- import com.android.systemui.Flags.centralizedStatusBarHeightFix
- import com.android.systemui.Flags.migrateClocksToBlueprint
-+import com.android.keyguard.CarrierTextManager
- import com.android.systemui.dagger.SysUISingleton
- import com.android.systemui.dagger.qualifiers.Main
- import com.android.systemui.fragments.FragmentService
-@@ -36,11 +37,14 @@ import com.android.systemui.lifecycle.repeatWhenAttached
- import com.android.systemui.navigationbar.NavigationModeController
- import com.android.systemui.plugins.qs.QS
- import com.android.systemui.plugins.qs.QSContainerController
-+import com.android.systemui.plugins.statusbar.StatusBarStateController
- import com.android.systemui.recents.OverviewProxyService
- import com.android.systemui.recents.OverviewProxyService.OverviewProxyListener
- import com.android.systemui.res.R
-+import com.android.systemui.shade.carrier.ShadeCarrierTextController
- import com.android.systemui.shade.domain.interactor.ShadeInteractor
- import com.android.systemui.shared.system.QuickStepContract
-+import com.android.systemui.statusbar.StatusBarState
- import com.android.systemui.statusbar.notification.stack.NotificationStackScrollLayoutController
- import com.android.systemui.statusbar.policy.SplitShadeStateController
- import com.android.systemui.util.LargeScreenUtils
-@@ -68,8 +72,28 @@ class NotificationsQSContainerController @Inject constructor(
-     notificationStackScrollLayoutController: NotificationStackScrollLayoutController,
+@@ -70,11 +70,31 @@ constructor(
+     @Main private val delayableExecutor: DelayableExecutor,
+     private val notificationStackScrollLayoutController: NotificationStackScrollLayoutController,
      private val splitShadeStateController: SplitShadeStateController,
-     private val largeScreenHeaderHelperLazy: Lazy<LargeScreenHeaderHelper>,
 +    private val carrierTextManagerBuilder: CarrierTextManager.Builder,
 +    private val statusBarStateController: StatusBarStateController,
+     private val shadeModeInteractor: ShadeModeInteractor,
+     private val largeScreenHeaderHelperLazy: Lazy<LargeScreenHeaderHelper>,
+     @Background private val backgroundScope: CoroutineScope,
  ) : ViewController<NotificationsQuickSettingsContainer>(view), QSContainerController {
  
 +    // KitKat UI Project: carrier label at the bottom of the shade
@@ -63415,62 +63208,58 @@ index 29de688fa7bf..78bc0bd537b5 100644
      private var splitShadeEnabled = false
      private var isQSDetailShowing = false
      private var isQSCustomizing = false
-@@ -130,11 +154,19 @@ class NotificationsQSContainerController @Inject constructor(
-         isGestureNavigation = QuickStepContract.isGesturalMode(currentMode)
+@@ -138,6 +158,12 @@ constructor(
  
          mView.setStackScroller(notificationStackScrollLayoutController.getView())
-+
+ 
 +        shadeCarrierTextController = ShadeCarrierTextController(
 +            mView.findViewById(R.id.kitkat_shade_carrier_text),
 +            carrierTextManagerBuilder,
 +            statusBarStateController)
 +        shadeCarrierTextController.init()
-     }
- 
++
+         if (SceneContainerFlag.isEnabled) {
+             observeSplitShadeState()
+         }
+@@ -158,6 +184,8 @@ constructor(
      public override fun onViewAttached() {
          updateResources()
-         overviewProxyService.addCallback(taskbarVisibilityListener)
+         launcherProxyService.addCallback(taskbarVisibilityListener)
 +        statusBarStateController.addCallback(shadeBottomHandleStateListener)
 +        shadeBottomHandleStateListener.onStateChanged(statusBarStateController.getState())
          mView.setInsetsChangedListener(delayedInsetSetter)
          mView.setQSFragmentAttachedListener { qs: QS -> qs.setContainerController(this) }
          mView.setConfigurationChangedListener { updateResources() }
-@@ -143,6 +175,7 @@ class NotificationsQSContainerController @Inject constructor(
+@@ -166,6 +194,7 @@ constructor(
  
      override fun onViewDetached() {
-         overviewProxyService.removeCallback(taskbarVisibilityListener)
+         launcherProxyService.removeCallback(taskbarVisibilityListener)
 +        statusBarStateController.removeCallback(shadeBottomHandleStateListener)
          mView.removeOnInsetsChangedListener()
          mView.removeQSFragmentAttachedListener()
          mView.setConfigurationChangedListener(null)
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt b/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
-index f3efa031a2a6..811c8a378d73 100644
+index 15bb93fade32..3336fc64d429 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
-@@ -27,10 +27,14 @@ import android.graphics.Insets
+@@ -28,6 +28,8 @@ import android.graphics.Insets
  import android.os.Bundle
  import android.os.Trace
  import android.os.Trace.TRACE_TAG_APP
 +import android.os.UserManager
- import android.provider.AlarmClock
 +import android.provider.Settings
+ import android.provider.AlarmClock
  import android.view.DisplayCutout
  import android.view.View
- import android.view.WindowInsets
-+import android.widget.ImageButton
-+import android.widget.ImageView
- import android.widget.TextView
- import androidx.annotation.VisibleForTesting
- import androidx.constraintlayout.motion.widget.MotionLayout
-@@ -68,6 +72,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController
+@@ -84,6 +86,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController
  import com.android.systemui.statusbar.policy.NextAlarmController
  import com.android.systemui.statusbar.policy.VariableDateView
  import com.android.systemui.statusbar.policy.VariableDateViewController
 +import com.android.systemui.settings.UserTracker
  import com.android.systemui.util.ViewController
+ import dagger.Lazy
  import java.io.PrintWriter
- import javax.inject.Inject
-@@ -102,6 +107,8 @@ constructor(
+@@ -122,6 +125,8 @@ constructor(
      private val nextAlarmController: NextAlarmController,
      private val activityStarter: ActivityStarter,
      private val statusOverlayHoverListenerFactory: StatusOverlayHoverListenerFactory,
@@ -63478,8 +63267,8 @@ index f3efa031a2a6..811c8a378d73 100644
 +    private val userTracker: UserTracker,
  ) : ViewController<View>(header), Dumpable {
  
-     companion object {
-@@ -138,6 +145,12 @@ constructor(
+     private val statusBarContentInsetsProvider
+@@ -166,6 +171,12 @@ constructor(
      private val mShadeCarrierGroup: ShadeCarrierGroup = header.requireViewById(R.id.carrier_group)
      private val systemIconsHoverContainer: View =
          header.requireViewById(R.id.hover_system_icons_container)
@@ -63492,9 +63281,9 @@ index f3efa031a2a6..811c8a378d73 100644
  
      private var roundedCorners = 0
      private var cutout: DisplayCutout? = null
-@@ -306,6 +319,17 @@ constructor(
-         variableDateViewControllerFactory.create(date as VariableDateView).init()
-         batteryMeterViewController.init()
+@@ -429,6 +440,24 @@ constructor(
+         }
+         clock.setOnClickListener { launchClockActivity() }
  
 +        // KitKat UI Project: load the QS header user avatar (circular crop is
 +        // handled by the view's outline background; fall back to the 4.4-style
@@ -63507,23 +63296,17 @@ index f3efa031a2a6..811c8a378d73 100644
 +            icon ?: header.context.getDrawable(R.drawable.kitkat_qs_user_avatar)
 +        )
 +
-         // battery settings same as in QS icons
-         batteryMeterViewController.ignoreTunerUpdates()
- 
-@@ -342,6 +366,12 @@ constructor(
-                 Intent(Intent.ACTION_POWER_USAGE_SUMMARY), 0
-             )
-         }
 +        // KitKat UI Project: settings gear in the shade header
 +        settingsButton.setOnClickListener {
 +            activityStarter.postStartActivityDismissingKeyguard(
 +                Intent(Settings.ACTION_SETTINGS), 0
 +            )
 +        }
- 
++
          dumpManager.registerDumpable(this)
          configurationController.addCallback(configurationControllerListener)
-@@ -355,6 +385,7 @@ constructor(
+         demoModeController.addCallback(demoModeReceiver)
+@@ -441,6 +470,7 @@ constructor(
  
      override fun onViewDetached() {
          clock.setOnClickListener(null)
@@ -63635,12 +63418,12 @@ index 000000000000..e994c47ccc08
 +}
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt b/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
-index 11636bdf0f17..861fd8d884a7 100644
+index d96ddc18d4e4..3e8239d63084 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
-@@ -272,7 +272,14 @@ constructor(
+@@ -393,7 +393,14 @@ constructor(
              this and APPEARANCE_LOW_PROFILE_BARS != 0 -> StatusBarMode.LIGHTS_OUT_TRANSPARENT
-             this and APPEARANCE_OPAQUE_STATUS_BARS != 0 -> StatusBarMode.OPAQUE
+             this and APPEARANCE_OPAQUE_STATUS_BARS != 0 -> StatusBarMode.OPAQUE_DARK
              this and APPEARANCE_SEMI_TRANSPARENT_STATUS_BARS != 0 -> StatusBarMode.SEMI_TRANSPARENT
 -            else -> StatusBarMode.TRANSPARENT
 +            // KitKat UI Project: 4.4 defaulted the status bar to opaque black
@@ -63655,37 +63438,37 @@ index 11636bdf0f17..861fd8d884a7 100644
      }
  
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
-index f792898520a2..96eaaa9f31ea 100644
+index 435898965f47..0c58c9601588 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
-@@ -16,9 +16,7 @@
+@@ -16,7 +16,6 @@
  
  package com.android.systemui.statusbar.notification.footer.ui.view;
  
 -import static android.graphics.PorterDuff.Mode.SRC_ATOP;
  
--import static com.android.systemui.Flags.notificationBackgroundTintOptimization;
- import static com.android.systemui.util.ColorUtilKt.hexColorString;
- 
- import android.annotation.ColorInt;
-@@ -29,8 +27,6 @@ import android.content.Context;
+ import static com.android.systemui.Flags.notificationFooterBackgroundTintOptimization;
+ import static com.android.systemui.Flags.notificationShadeBlur;
+@@ -30,9 +29,6 @@ import android.content.Context;
  import android.content.res.ColorStateList;
  import android.content.res.Configuration;
  import android.content.res.Resources;
+-import android.graphics.Color;
 -import android.graphics.ColorFilter;
 -import android.graphics.PorterDuffColorFilter;
  import android.graphics.drawable.Drawable;
  import android.util.AttributeSet;
  import android.util.IndentingPrintWriter;
-@@ -39,7 +35,6 @@ import android.widget.TextView;
+@@ -41,8 +37,6 @@ import android.widget.TextView;
  
  import androidx.annotation.NonNull;
  
--import com.android.settingslib.Utils;
+-import com.android.internal.graphics.ColorUtils;
+-import com.android.systemui.common.shared.colors.SurfaceEffectColors;
  import com.android.systemui.res.R;
+ import com.android.systemui.scene.shared.flag.SceneContainerFlag;
  import com.android.systemui.statusbar.notification.ColorUpdateLogger;
- import com.android.systemui.statusbar.notification.footer.shared.FooterViewRefactor;
-@@ -369,25 +364,17 @@ public class FooterView extends StackScrollerDecorView {
+@@ -301,48 +295,20 @@ public class FooterView extends StackScrollerDecorView {
  
      /**
       * Update the text and background colors for the current color palette and night mode setting.
@@ -63696,48 +63479,71 @@ index f792898520a2..96eaaa9f31ea 100644
       */
      public void updateColors() {
          Resources.Theme theme = mContext.getTheme();
--        final @ColorInt int onSurface = Utils.getColorAttrDefaultColor(mContext,
--                com.android.internal.R.attr.materialColorOnSurface);
+-        final @ColorInt int onSurface = mContext.getColor(
+-                com.android.internal.R.color.materialColorOnSurface);
 +        final @ColorInt int onSurface = 0xFFEEEEEE;
 +        final @ColorInt int scHigh = 0;
+         // Same resource, separate drawables to prevent touch effects from showing on the wrong
+         // button.
          final Drawable clearAllBg = theme.getDrawable(R.drawable.notif_footer_btn_background);
-         final Drawable manageBg = theme.getDrawable(R.drawable.notif_footer_btn_background);
+         final Drawable settingsBg = theme.getDrawable(R.drawable.notif_footer_btn_background);
+         final Drawable historyBg = theme.getDrawable(R.drawable.notif_footer_btn_background);
 -        final @ColorInt int scHigh;
--        if (!notificationBackgroundTintOptimization()) {
--            scHigh = Utils.getColorAttrDefaultColor(mContext,
--                    com.android.internal.R.attr.materialColorSurfaceContainerHigh);
+-
+-        if (!notificationFooterBackgroundTintOptimization()) {
+-            if (notificationShadeBlur()) {
+-                if (mIsBlurSupported) {
+-                    Color backgroundColor = Color.valueOf(
+-                            SurfaceEffectColors.surfaceEffect1(getContext()));
+-                    scHigh = ColorUtils.setAlphaComponent(backgroundColor.toArgb(), 0xFF);
+-                    // Apply alpha on background drawables.
+-                    int backgroundAlpha = (int) (backgroundColor.alpha() * 0xFF);
+-                    clearAllBg.setAlpha(backgroundAlpha);
+-                    settingsBg.setAlpha(backgroundAlpha);
+-                    if (historyBg != null) {
+-                        historyBg.setAlpha(backgroundAlpha);
+-                    }
+-                } else {
+-                    scHigh = mContext.getColor(
+-                            com.android.internal.R.color.materialColorSurfaceContainer);
+-                }
+-            } else {
+-                scHigh = mContext.getColor(
+-                        com.android.internal.R.color.materialColorSurfaceContainerHigh);
+-            }
 -            if (scHigh != 0) {
 -                final ColorFilter bgColorFilter = new PorterDuffColorFilter(scHigh, SRC_ATOP);
 -                clearAllBg.setColorFilter(bgColorFilter);
--                manageBg.setColorFilter(bgColorFilter);
+-                settingsBg.setColorFilter(bgColorFilter);
+-                historyBg.setColorFilter(bgColorFilter);
 -            }
 -        } else {
 -            scHigh = 0;
 -        }
+ 
          mClearAllButton.setBackground(clearAllBg);
          mClearAllButton.setTextColor(onSurface);
-         mManageOrHistoryButton.setBackground(manageBg);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
-index 18e95781a32c..fde5abb0a890 100644
+index 315fe3420083..e04861b702d7 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
-@@ -74,6 +74,7 @@ import android.os.Trace;
+@@ -60,6 +60,7 @@ import android.os.Trace;
  import android.os.UserHandle;
  import android.provider.Settings;
  import android.service.dreams.IDreamManager;
 +import android.service.notification.NotificationListenerService.RankingMap;
  import android.service.notification.StatusBarNotification;
- import android.text.TextUtils;
  import android.util.ArraySet;
-@@ -185,6 +186,7 @@ import com.android.systemui.shared.recents.utilities.Utilities;
- import com.android.systemui.statusbar.AutoHideUiElement;
- import com.android.systemui.statusbar.CircleReveal;
+ import android.util.DisplayMetrics;
+@@ -162,6 +163,7 @@ import com.android.systemui.shade.ShadeLogger;
+ import com.android.systemui.shade.ShadeSurface;
+ import com.android.systemui.shade.ShadeViewController;
  import com.android.systemui.statusbar.CommandQueue;
 +import com.android.systemui.statusbar.NotificationListener;
  import com.android.systemui.statusbar.GestureRecorder;
- import com.android.systemui.statusbar.KeyboardShortcutListSearch;
- import com.android.systemui.statusbar.KeyboardShortcuts;
-@@ -451,6 +453,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+ import com.android.systemui.statusbar.KeyguardIndicationController;
+ import com.android.systemui.statusbar.LightRevealScrim;
+@@ -395,6 +397,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
  
      private final NotificationGutsManager mGutsManager;
      private final ShadeExpansionStateManager mShadeExpansionStateManager;
@@ -63745,9 +63551,9 @@ index 18e95781a32c..fde5abb0a890 100644
 +    private final NotificationListener mNotificationListener;
 +    private Ticker mTicker;
      private final KeyguardViewMediator mKeyguardViewMediator;
-     private final BrightnessSliderController.Factory mBrightnessSliderFactory;
-     private final FeatureFlags mFeatureFlags;
-@@ -608,6 +613,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+     private final FragmentService mFragmentService;
+     private final ScreenOffAnimationController mScreenOffAnimationController;
+@@ -517,6 +522,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
      @Inject
      public CentralSurfacesImpl(
              Context context,
@@ -63755,7 +63561,7 @@ index 18e95781a32c..fde5abb0a890 100644
              NotificationsController notificationsController,
              FragmentService fragmentService,
              LightBarController lightBarController,
-@@ -732,6 +738,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+@@ -632,6 +638,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
          mFalsingManager = falsingManager;
          mBroadcastDispatcher = broadcastDispatcher;
          mGutsManager = notificationGutsManager;
@@ -63763,60 +63569,65 @@ index 18e95781a32c..fde5abb0a890 100644
          mShadeExpansionStateManager = shadeExpansionStateManager;
          mKeyguardViewMediator = keyguardViewMediator;
          mDisplayMetrics = displayMetrics;
-@@ -1216,6 +1223,53 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
-         mStatusBarInitializer.setStatusBarViewUpdatedListener(
-                 (statusBarView, statusBarViewController, statusBarTransitions) -> {
-                     mStatusBarView = statusBarView;
-+                    // KitKat UI Project: wire the 4.4 ticker - a notification
-+                    // posted with the shade closed scrolls its icon, title and
-+                    // text through the status bar (see Ticker).
-+                    if (mTicker == null) {
-+                        mTicker = new Ticker(statusBarView.getContext(), statusBarView,
-+                                mShadeExpansionStateManager, () -> mDeviceInteractive);
-+                        mNotificationListener.addNotificationHandler(
-+                                new com.android.systemui.statusbar.NotificationListener
-+                                        .NotificationHandler() {
-+                                    @Override
-+                                    public void onNotificationPosted(
-+                                            StatusBarNotification sbn,
-+                                            RankingMap rankingMap) {
-+                                        mTicker.add(sbn);
-+                                    }
+@@ -1172,6 +1179,58 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+                 mBroadcastReceiver, filter, executor, UserHandle.ALL);
+     }
+ 
++    /**
++     * KitKat UI Project: wire the 4.4 ticker to a freshly created status bar
++     * view. Called from HomeStatusBarModule when the home status bar
++     * component is built (lineage-24 creates the status bar view through the
++     * HomeStatusBarComponent dagger subcomponent, not here).
++     */
++    public Ticker createTicker(PhoneStatusBarView statusBarView) {
++        if (mTicker == null) {
++            mTicker = new Ticker(statusBarView.getContext(), statusBarView,
++                    mShadeExpansionStateManager, this::isDeviceInteractive);
++            mNotificationListener.addNotificationHandler(
++                    new NotificationListener.NotificationHandler() {
++                        @Override
++                        public void onNotificationPosted(
++                                StatusBarNotification sbn,
++                                RankingMap rankingMap) {
++                            mTicker.add(sbn);
++                        }
 +
-+                                    @Override
-+                                    public void onNotificationRemoved(
-+                                            StatusBarNotification sbn,
-+                                            RankingMap rankingMap) {
-+                                        // KitKat UI Project (P3): stop a
-+                                        // running tick when its notification
-+                                        // is removed.
-+                                        if (mTicker != null) {
-+                                            mTicker.remove(sbn);
-+                                        }
-+                                    }
++                        @Override
++                        public void onNotificationRemoved(
++                                StatusBarNotification sbn,
++                                RankingMap rankingMap) {
++                            // KitKat UI Project (P3): stop a running tick when
++                            // its notification is removed.
++                            if (mTicker != null) {
++                                mTicker.remove(sbn);
++                            }
++                        }
 +
-+                                    @Override
-+                                    public void onNotificationRemoved(
-+                                            StatusBarNotification sbn,
-+                                            RankingMap rankingMap, int reason) {
-+                                        if (mTicker != null) {
-+                                            mTicker.remove(sbn);
-+                                        }
-+                                    }
++                        @Override
++                        public void onNotificationRemoved(
++                                StatusBarNotification sbn,
++                                RankingMap rankingMap, int reason) {
++                            if (mTicker != null) {
++                                mTicker.remove(sbn);
++                            }
++                        }
 +
-+                                    @Override
-+                                    public void onNotificationRankingUpdate(
-+                                            RankingMap rankingMap) {
-+                                    }
++                        @Override
++                        public void onNotificationRankingUpdate(
++                                RankingMap rankingMap) {
++                        }
 +
-+                                    @Override
-+                                    public void onNotificationsInitialized() {
-+                                    }
-+                                });
-+                    }
-                     mPhoneStatusBarViewController = statusBarViewController;
-                     mStatusBarTransitions = statusBarTransitions;
-                     getNotificationShadeWindowViewController()
++                        @Override
++                        public void onNotificationsInitialized() {
++                        }
++                    });
++        }
++        return mTicker;
++    }
++
+     protected QS createDefaultQSFragment() {
+         return mFragmentService
+                 .getFragmentHostManager(getNotificationShadeWindowView())
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/Ticker.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/Ticker.java
 new file mode 100644
 index 000000000000..a6afb05ec69a
@@ -64041,40 +63852,71 @@ index 000000000000..a6afb05ec69a
 +    }
 +}
 \ No newline at end of file
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/BrightnessMirrorController.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/BrightnessMirrorController.java
-index c53779edb720..3ee6da58c9f2 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/BrightnessMirrorController.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/BrightnessMirrorController.java
-@@ -28,7 +28,7 @@ import android.view.LayoutInflater;
- import android.view.View;
- import android.view.ViewGroup;
- import android.widget.FrameLayout;
--import android.widget.ImageView;
-+import android.widget.CompoundButton;
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarComponent.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarComponent.java
+index c5cb32a1b0b9..fa57279d2988 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarComponent.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarComponent.java
+@@ -24,6 +24,7 @@ import com.android.systemui.statusbar.phone.HeadsUpAppearanceController;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarTransitions;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarView;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarViewController;
++import com.android.systemui.statusbar.phone.Ticker;
+ import com.android.systemui.statusbar.phone.StatusBarDemoMode;
+ import com.android.systemui.statusbar.window.StatusBarWindowController;
  
+@@ -85,8 +86,18 @@ public interface HomeStatusBarComponent {
+         getHeadsUpAppearanceController().init();
+         getPhoneStatusBarViewController().init();
+         getStatusBarDemoMode().init();
++        // KitKat UI Project: force-create the 4.4 ticker (it wires itself
++        // into the notification pipeline on first creation).
++        getTicker();
+     }
+ 
++    /**
++     * KitKat UI Project: the 4.4 ticker bound to this component's status bar
++     * view.
++     */
++    @HomeStatusBarScope
++    Ticker getTicker();
++
+     /** */
+     @HomeStatusBarScope
+     @RootView
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
+index dc4d1d5d75e3..e597038e0a45 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
+@@ -21,7 +21,9 @@ import android.view.ViewStub;
+ 
+ import com.android.systemui.dagger.qualifiers.RootView;
  import com.android.systemui.res.R;
- import com.android.systemui.settings.brightness.BrightnessSliderController;
-@@ -61,7 +61,7 @@ public class BrightnessMirrorController
-     private int mLastBrightnessSliderWidth = -1;
-     private boolean mShouldShowAutoBrightness;
-     private boolean mIsAutomaticBrightnessAvailable;
--    private ImageView mIcon;
-+    private CompoundButton mIcon;
++import com.android.systemui.statusbar.core.CentralSurfaces;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarTransitions;
++import com.android.systemui.statusbar.phone.Ticker;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarView;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarViewController;
+ import com.android.systemui.statusbar.phone.StatusBarLocation;
+@@ -111,6 +113,19 @@ public interface HomeStatusBarModule {
+                 phoneStatusBarView);
+     }
  
-     public BrightnessMirrorController(NotificationShadeWindowView statusBarWindow,
-             ShadeViewController shadeViewController,
-@@ -219,9 +219,8 @@ public class BrightnessMirrorController
-                     Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL,
-                     UserHandle.USER_CURRENT);
-             boolean isAutomatic = automatic != Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL;
--            mIcon.setImageResource(isAutomatic
--                    ? R.drawable.ic_qs_brightness_auto_on
--                    : R.drawable.ic_qs_brightness_auto_off);
-+            // KitKat UI Project: Holo "Auto" checkbox (was auto on/off icon pair)
-+            mIcon.setChecked(isAutomatic);
-             mIcon.setVisibility(View.VISIBLE);
-         } else {
-             mIcon.setVisibility(View.GONE);
++    /**
++     * KitKat UI Project: the 4.4 ticker, built against the home status bar
++     * view and wired to the notification pipeline through
++     * {@link com.android.systemui.statusbar.phone.CentralSurfacesImpl#createTicker}.
++     */
++    @Provides
++    @HomeStatusBarScope
++    static Ticker provideTicker(
++            @RootView PhoneStatusBarView phoneStatusBarView,
++            CentralSurfaces centralSurfaces) {
++        return centralSurfaces.createTicker(phoneStatusBarView);
++    }
++
+     /** */
+     @Provides
+     @HomeStatusBarScope
 -- 
 2.53.0
 

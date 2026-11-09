@@ -163,14 +163,14 @@ flat colors (getColor() cannot resolve the donor selector).
  java/res/drawable/btn_suggestion_klp.xml      |  27 +++
  .../drawable/keyboard_key_feedback_klp.xml    |  36 ++++
  java/res/drawable/transparent.xml             |  30 ++++
- java/res/values/attrs.xml                     |   4 +
+ java/res/values/attrs.xml                     |   5 +-
  java/res/values/colors.xml                    |  18 ++
  java/res/values/keyboard-icons-holo.xml       |  42 +++++
  java/res/values/keyboard-themes.xml           |  14 +-
  java/res/values/strings.xml                   |   2 +
  java/res/values/themes-kitkat.xml             | 159 ++++++++++++++++++
- .../inputmethod/keyboard/KeyboardTheme.java   |  18 +-
- 157 files changed, 506 insertions(+), 16 deletions(-)
+ .../inputmethod/keyboard/KeyboardTheme.java   |  19 +--
+ 157 files changed, 504 insertions(+), 20 deletions(-)
  create mode 100644 java/res/color/emoji_tab_label_color_holo.xml
  create mode 100644 java/res/color/key_text_color_holo.xml
  create mode 100644 java/res/drawable-hdpi/btn_keyboard_key_dark_active_klp.9.png
@@ -6059,19 +6059,20 @@ index 000000000..855cf2ad5
 +        android:height="40dp" />
 +</shape>
 diff --git a/java/res/values/attrs.xml b/java/res/values/attrs.xml
-index c771f1102..865d6f951 100644
+index 07a4647e9..e28da22c9 100644
 --- a/java/res/values/attrs.xml
 +++ b/java/res/values/attrs.xml
-@@ -241,6 +241,8 @@
+@@ -243,7 +243,8 @@
              <enum name="LXXLight" value="3" />
              <enum name="LXXDark" value="4" />
              <enum name="You" value="6" />
+-            <enum name="OLED" value="7" />
 +            <!-- KitKat UI Project (13.1): 4.4 Holo keyboard theme -->
 +            <enum name="KitKat" value="7" />
          </attr>
          <!-- Touch position correction -->
          <attr name="touchPositionCorrectionData" format="reference" />
-@@ -486,6 +488,8 @@
+@@ -492,6 +493,8 @@
              <enum name="LXXLight" value="3" />
              <enum name="LXXDark" value="4" />
              <enum name="You" value="6" />
@@ -6156,10 +6157,10 @@ index 000000000..38ccef12a
 +    </style>
 +</resources>
 diff --git a/java/res/values/keyboard-themes.xml b/java/res/values/keyboard-themes.xml
-index 293220094..769961404 100644
+index d3f289f36..769961404 100644
 --- a/java/res/values/keyboard-themes.xml
 +++ b/java/res/values/keyboard-themes.xml
-@@ -19,18 +19,16 @@
+@@ -19,20 +19,16 @@
  -->
  <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
      <!-- For keyboard color scheme option dialog. -->
@@ -6172,6 +6173,7 @@ index 293220094..769961404 100644
 -        <item>@string/keyboard_theme_material_dark</item>
 -        <item>@string/keyboard_theme_material_follow_system</item>
 -        <item>@string/keyboard_theme_material_you</item>
+-        <item>@string/keyboard_theme_oled</item>
 +        <item>@string/keyboard_theme_kitkat</item>
      </string-array>
      <!-- An element must be a keyboard theme id of
@@ -6181,11 +6183,11 @@ index 293220094..769961404 100644
 -        <item>4</item>
 -        <item>5</item>
 -        <item>6</item>
-+        <item>7</item>
+         <item>7</item>
      </integer-array>
  </resources>
 diff --git a/java/res/values/strings.xml b/java/res/values/strings.xml
-index d32ee3c29..370ee27f9 100644
+index ba3bedfe9..24a9c8066 100644
 --- a/java/res/values/strings.xml
 +++ b/java/res/values/strings.xml
 @@ -353,6 +353,8 @@ mobile devices. [CHAR LIMIT=25] -->
@@ -6363,13 +6365,14 @@ index 000000000..97928092a
 +    </style>
 +</resources>
 diff --git a/java/src/com/android/inputmethod/keyboard/KeyboardTheme.java b/java/src/com/android/inputmethod/keyboard/KeyboardTheme.java
-index fbfb108e1..0a9ac8c6b 100644
+index 0b5c0d7d8..0a9ac8c6b 100644
 --- a/java/src/com/android/inputmethod/keyboard/KeyboardTheme.java
 +++ b/java/src/com/android/inputmethod/keyboard/KeyboardTheme.java
-@@ -41,7 +41,11 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
+@@ -41,8 +41,11 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
      public static final int THEME_ID_LXX_DARK = 4;
      public static final int THEME_ID_AUTO_DARK = 5;
      public static final int THEME_ID_YOU = 6;
+-    public static final int THEME_ID_OLED = 7;
 -    public static final int DEFAULT_THEME_ID = THEME_ID_AUTO_DARK;
 +    // KitKat UI Project (13.1): the 4.4 Holo keyboard theme, ported from
 +    // android-4.4.4_r1 LatinIME (themes-kitkat.xml). Default and only
@@ -6379,16 +6382,16 @@ index fbfb108e1..0a9ac8c6b 100644
  
      private static KeyboardTheme[] AVAILABLE_KEYBOARD_THEMES;
  
-@@ -57,6 +61,8 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
+@@ -58,7 +61,7 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
                  Build.VERSION_CODES.Q),
          new KeyboardTheme(THEME_ID_YOU, "You", R.style.KeyboardTheme_You,
                  Build.VERSION_CODES.S_V2),
+-        new KeyboardTheme(THEME_ID_OLED, "OLED", R.style.KeyboardTheme_OLED,
 +        new KeyboardTheme(THEME_ID_KITKAT, "KitKat", R.style.KeyboardTheme_KitKat,
-+                VERSION_CODES.BASE),
+                 VERSION_CODES.BASE),
      };
  
-     static {
-@@ -160,13 +166,9 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
+@@ -163,13 +166,9 @@ public final class KeyboardTheme implements Comparable<KeyboardTheme> {
      static KeyboardTheme getKeyboardTheme(final Context context, final int sdkVersion) {
          int themeId = getSelectedKeyboardThemeId(context);
          if (THEME_ID_AUTO_DARK == themeId) {

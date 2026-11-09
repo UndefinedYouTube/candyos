@@ -1,10 +1,13 @@
 // KitKat UI Project: CandyLauncher, the Flutter launcher (package
 // com.example.thelauncher), vendored as a prebuilt signed APK.
 //
-// Registers under the TrebuchetQuickStep name because
+// Registers under the Launcher3QuickStep name because
 // vendor/lineage/config/common_mobile.mk adds that module to
-// PRODUCT_PACKAGES for non-Go products, so the prebuilt drops into the same
-// slot Trebuchet used to occupy with zero product-config changes.
+// PRODUCT_PACKAGES for non-Go products, so the prebuilt drops into the
+// same slot the stock Launcher3 port occupied (los-24 replaced Trebuchet
+// with Launcher3; the module name follows it) with zero product-config
+// changes - the stock packages/apps/Launcher3 project is removed from the
+// manifest by manifest/candyos.xml.
 //
 // Installed non-privileged on purpose: the APK requests privileged
 // permissions (DUMP etc.) but ships no privapp-permissions whitelist, and
@@ -16,7 +19,7 @@
 // integration here either, so dropping the KitKat Launcher3 port loses
 // nothing but its in-tree sources.
 android_app_import {
-    name: "TrebuchetQuickStep",
+    name: "Launcher3QuickStep",
 
     apk: "CandyLauncher.apk",
     presigned: true,
@@ -46,14 +49,27 @@ android_app_import {
     ],
 }
 
-// KitKat UI Project: Trebuchet used to provide the TAPL (Test Automation
-// Programming Library) module that platform_testing (flicker, launcher-helper)
-// links against. CandyLauncher is a prebuilt and has no TAPL sources, but the
-// module name must exist for soong dependency resolution. The test consumers
-// are not part of the system image, so an empty library is sufficient.
+// KitKat UI Project: Launcher3 provides the TAPL (Test Automation
+// Programming Library) module that platform_testing (flicker,
+// launcher-helper) links against. CandyLauncher is a prebuilt and has no
+// TAPL sources, but the module name must exist for soong dependency
+// resolution. The test consumers are not part of the system image, so an
+// empty library is sufficient.
 android_library {
     name: "launcher-aosp-tapl",
     srcs: [],
     resource_dirs: [],
+    sdk_version: "current",
+}
+
+// KitKat UI Project: Launcher3 also provides its aconfig flag library
+// (com_android_launcher3_flags_lib), which frameworks/base
+// (services/core, WindowManager/Shell, iconloaderlib) links wholesale.
+// No CandyOS-tree production code references the flag classes, so an
+// empty library satisfies soong dependency resolution the same way as
+// the TAPL stub above.
+java_library {
+    name: "com_android_launcher3_flags_lib",
+    srcs: [],
     sdk_version: "current",
 }

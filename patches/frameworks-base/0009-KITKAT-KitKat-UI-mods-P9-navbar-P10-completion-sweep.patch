@@ -1,16 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Wed, 21 Oct 2026 19:01:45 -0500
-Subject: [PATCH 09/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
- sweep (framework theme/fonts, SystemUI shade/QS/recents/ticker/navbar,
- Settings icons, hybrid 2013 emoji font, easter egg)
+Date: Sun, 8 Nov 2026 16:16:53 -0600
+Subject: [PATCH 09/19] KITKAT: KitKat UI mods - P9 navbar, P10 completion
+ sweep (round 3)
 
+Styles follow-up from the P9/P10 completion sweep (ported to the
+lineage-24 tree).
+
+Change-Id: I7b8c7e1cd1b3f7ba3d4d5e6f708192a3b4c5d6e9
 ---
  .../res/res/values/styles_device_defaults.xml | 29 +++++++++++++++----
  1 file changed, 23 insertions(+), 6 deletions(-)
 
 diff --git a/core/res/res/values/styles_device_defaults.xml b/core/res/res/values/styles_device_defaults.xml
-index aa26fc5a81ce..21cae74dba6f 100644
+index 29732beb6f04..73f0d4dfd991 100644
 --- a/core/res/res/values/styles_device_defaults.xml
 +++ b/core/res/res/values/styles_device_defaults.xml
 @@ -37,12 +37,12 @@ easier.

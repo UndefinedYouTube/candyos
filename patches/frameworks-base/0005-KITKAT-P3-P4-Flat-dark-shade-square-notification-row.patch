@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
-Date: Tue, 20 Oct 2026 14:14:43 -0500
-Subject: [PATCH 05/20] KITKAT-P3/P4: Flat dark shade, square notification
+Date: Sun, 8 Nov 2026 16:08:07 -0600
+Subject: [PATCH 05/19] KITKAT-P3/P4: Flat dark shade, square notification
  rows, squared volume slider
 
 - notification_material_bg base layer -> flat #ff252525 (state layer is
@@ -12,6 +12,8 @@ Subject: [PATCH 05/20] KITKAT-P3/P4: Flat dark shade, square notification
   4dp -> 0dp (feeds StackScrollAlgorithm, NotificationStackScrollLayout,
   ExpandableNotificationRow, media control panel)
 - volume_dialog_slider_corner_radius 21dp -> 2dp
+
+Change-Id: Ie6fae738255bdd65c25642ab9c295f6a204ba3e2
 ---
  .../SystemUI/res/drawable/notification_material_bg.xml |  2 +-
  packages/SystemUI/res/drawable/rounded_bg_full.xml     | 10 +++++-----
@@ -19,27 +21,27 @@ Subject: [PATCH 05/20] KITKAT-P3/P4: Flat dark shade, square notification
  3 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/packages/SystemUI/res/drawable/notification_material_bg.xml b/packages/SystemUI/res/drawable/notification_material_bg.xml
-index 3f903aece0b5..0e36bb7d02d1 100644
+index eb8d70c23267..bccc2adf00b1 100644
 --- a/packages/SystemUI/res/drawable/notification_material_bg.xml
 +++ b/packages/SystemUI/res/drawable/notification_material_bg.xml
 @@ -20,7 +20,7 @@
          android:color="?android:attr/colorControlHighlight">
      <item>
          <shape>
--            <solid android:color="?androidprv:attr/materialColorSurfaceContainerHigh" />
+-            <solid android:color="@color/materialColorSurfaceContainerHigh" />
 +            <solid android:color="#ff252525" />
          </shape>
      </item>
      <item>
 diff --git a/packages/SystemUI/res/drawable/rounded_bg_full.xml b/packages/SystemUI/res/drawable/rounded_bg_full.xml
-index 967c57b0c370..3746afcd3ce7 100644
+index 4f8ec25c8f8a..3746afcd3ce7 100644
 --- a/packages/SystemUI/res/drawable/rounded_bg_full.xml
 +++ b/packages/SystemUI/res/drawable/rounded_bg_full.xml
 @@ -2,11 +2,11 @@
  <shape xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
         android:shape="rectangle">
--    <solid android:color="?androidprv:attr/colorSurface" />
+-    <solid android:color="@color/materialColorSurfaceContainer" />
 +    <solid android:color="#ff161616" />
      <corners
 -        android:bottomLeftRadius="?android:attr/dialogCornerRadius"
@@ -53,17 +55,19 @@ index 967c57b0c370..3746afcd3ce7 100644
          />
  </shape>
 diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
-index 602a51bb0a36..7ec859afa0ac 100644
+index 937b1a03c4d0..48dc27416648 100644
 --- a/packages/SystemUI/res/values/dimens.xml
 +++ b/packages/SystemUI/res/values/dimens.xml
-@@ -307,13 +307,13 @@
+@@ -352,7 +352,7 @@
      <dimen name="notification_min_interaction_height">40dp</dimen>
  
      <!-- Radius for notifications corners without adjacent notifications -->
 -    <dimen name="notification_corner_radius">28dp</dimen>
 +    <dimen name="notification_corner_radius">0dp</dimen>
  
-     <!-- Distance over which notification corner animations run, near the shelf while scrolling. -->
+     <!-- Stroke width for notifications focus state overlay, see id/notification_focus_outline -->
+     <dimen name="notification_focus_stroke_width">3dp</dimen>
+@@ -361,7 +361,7 @@
      <dimen name="notification_corner_animation_distance">48dp</dimen>
  
      <!-- Radius for notifications corners with adjacent notifications -->
@@ -72,9 +76,9 @@ index 602a51bb0a36..7ec859afa0ac 100644
  
      <!-- the padding of the shelf icon container -->
      <dimen name="shelf_icon_container_padding">13dp</dimen>
-@@ -578,7 +578,7 @@
+@@ -640,7 +640,7 @@
  
-     <dimen name="volume_dialog_slider_width">42dp</dimen>
+     <dimen name="volume_dialog_slider_width_legacy">42dp</dimen>
  
 -    <dimen name="volume_dialog_slider_corner_radius">21dp</dimen>
 +    <dimen name="volume_dialog_slider_corner_radius">2dp</dimen>

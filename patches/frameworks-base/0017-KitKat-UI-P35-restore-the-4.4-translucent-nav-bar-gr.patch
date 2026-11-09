@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Fri, 30 Oct 2026 13:50:39 -0500
-Subject: [PATCH 17/20] KitKat UI P35: restore the 4.4 translucent nav bar
+Subject: [PATCH 17/19] KitKat UI P35: restore the 4.4 translucent nav bar
  gradient scrim
 
 Re-wire the BarTransitions gradient machinery (vestigial since the
@@ -22,8 +22,8 @@ scrim. PhoneStatusBarTransitions keeps the flat overlay.
 Change-Id: Ia117f778659a019c541780dc5f6f30a7ae3cf07e
 ---
  .../res/drawable/nav_bar_kitkat_scrim.xml     | 28 +++++++++++++++++++
- .../NavigationBarTransitions.java             |  8 +++++-
  .../statusbar/phone/BarTransitions.java       | 25 +++++++++++++++--
+ .../views/NavigationBarTransitions.java       |  8 +++++-
  3 files changed, 58 insertions(+), 3 deletions(-)
  create mode 100644 packages/SystemUI/res/drawable/nav_bar_kitkat_scrim.xml
 
@@ -62,30 +62,11 @@ index 000000000000..e528f33293ba
 +        />
 +</shape>
 \ No newline at end of file
-diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
-index 3e34318a5fb5..6d2f0e20cea5 100644
---- a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
-+++ b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
-@@ -74,7 +74,13 @@ public final class NavigationBarTransitions extends BarTransitions implements
-             NavigationBarView view,
-             LightBarTransitionsController.Factory lightBarTransitionsControllerFactory,
-             DisplayTracker displayTracker) {
--        super(view, R.drawable.nav_background);
-+        super(view, R.drawable.nav_bar_kitkat_scrim);
-+        // KitKat UI Project: apps requesting windowTranslucentNavigation put
-+        // the bar in MODE_SEMI_TRANSPARENT; draw the 4.4 gradient scrim
-+        // (dark gradient rising from the bottom of the screen over a
-+        // transparent bar) rather than the flat translucent overlay. The
-+        // opaque default from P9 is unaffected.
-+        setGradientScrimEnabled(true);
- 
-         mView = view;
-         mLightTransitionsController = lightBarTransitionsControllerFactory.create(this);
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
-index f62a79f199e9..4faa06eb36a2 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
-@@ -82,6 +82,16 @@ public class BarTransitions {
+diff --git a/packages/SystemUI/shared/src/com/android/systemui/shared/statusbar/phone/BarTransitions.java b/packages/SystemUI/shared/src/com/android/systemui/shared/statusbar/phone/BarTransitions.java
+index da31255204ea..eac80a0ffbe5 100644
+--- a/packages/SystemUI/shared/src/com/android/systemui/shared/statusbar/phone/BarTransitions.java
++++ b/packages/SystemUI/shared/src/com/android/systemui/shared/statusbar/phone/BarTransitions.java
+@@ -95,6 +95,16 @@ public class BarTransitions {
          mView.setBackground(mBarBackground);
      }
  
@@ -102,7 +83,7 @@ index f62a79f199e9..4faa06eb36a2 100644
      public void destroy() {
          // To be overridden
      }
-@@ -169,6 +179,7 @@ public class BarTransitions {
+@@ -186,6 +196,7 @@ public class BarTransitions {
          private float mOverrideAlpha = 1f;
          private PorterDuffColorFilter mTintFilter;
          private Paint mPaint = new Paint();
@@ -110,7 +91,7 @@ index f62a79f199e9..4faa06eb36a2 100644
  
          private int mGradientAlphaStart;
          private int mColorStart;
-@@ -201,6 +212,11 @@ public class BarTransitions {
+@@ -220,6 +231,11 @@ public class BarTransitions {
              invalidateSelf();
          }
  
@@ -122,7 +103,7 @@ index f62a79f199e9..4faa06eb36a2 100644
          public float getOverrideAlpha() {
              return mOverrideAlpha;
          }
-@@ -280,9 +296,14 @@ public class BarTransitions {
+@@ -299,9 +315,14 @@ public class BarTransitions {
              if (mMode == MODE_WARNING) {
                  targetColor = mWarning;
              } else if (mMode == MODE_TRANSLUCENT) {
@@ -138,7 +119,26 @@ index f62a79f199e9..4faa06eb36a2 100644
 +                targetGradientAlpha = mGradientScrimEnabled ? 0xff : 0;
              } else if (mMode == MODE_TRANSPARENT || mMode == MODE_LIGHTS_OUT_TRANSPARENT) {
                  targetColor = mTransparent;
-             } else {
+             } else if (mMode == MODE_OPAQUE_LIGHT) {
+diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/views/NavigationBarTransitions.java b/packages/SystemUI/src/com/android/systemui/navigationbar/views/NavigationBarTransitions.java
+index 251745d2c0e6..5be2c39ceda9 100644
+--- a/packages/SystemUI/src/com/android/systemui/navigationbar/views/NavigationBarTransitions.java
++++ b/packages/SystemUI/src/com/android/systemui/navigationbar/views/NavigationBarTransitions.java
+@@ -74,7 +74,13 @@ public final class NavigationBarTransitions extends BarTransitions implements
+             NavigationBarView view,
+             LightBarTransitionsController.Factory lightBarTransitionsControllerFactory,
+             DisplayTracker displayTracker) {
+-        super(view, R.drawable.nav_background);
++        super(view, R.drawable.nav_bar_kitkat_scrim);
++        // KitKat UI Project: apps requesting windowTranslucentNavigation put
++        // the bar in MODE_SEMI_TRANSPARENT; draw the 4.4 gradient scrim
++        // (dark gradient rising from the bottom of the screen over a
++        // transparent bar) rather than the flat translucent overlay. The
++        // opaque default from P9 is unaffected.
++        setGradientScrimEnabled(true);
+ 
+         mView = view;
+         mLightTransitionsController = lightBarTransitionsControllerFactory.create(this);
 -- 
 2.53.0
 

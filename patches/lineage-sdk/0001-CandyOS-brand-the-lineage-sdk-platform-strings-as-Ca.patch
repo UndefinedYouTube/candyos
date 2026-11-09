@@ -12,10 +12,10 @@ Change-Id: I2c96f022f6a869361c00273ecb981b1374050f14
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/lineage/res/res/values/strings.xml b/lineage/res/res/values/strings.xml
-index fbb62349..703f4b35 100644
+index 5db677d5..c02f344d 100644
 --- a/lineage/res/res/values/strings.xml
 +++ b/lineage/res/res/values/strings.xml
-@@ -17,7 +17,7 @@
+@@ -6,7 +6,7 @@
  -->
  <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
      <!-- Label for the LineageOS system components when they are shown to the user. -->
@@ -24,7 +24,7 @@ index fbb62349..703f4b35 100644
  
      <!-- Labels for the MODIFY_PROFILES permission. -->
      <string name="permlab_modifyProfiles">modify system profiles</string>
-@@ -90,11 +90,11 @@
+@@ -85,11 +85,11 @@
      <!-- About device screen, build date -->
      <string name="build_date">Build date</string>
      <!-- About device screen, LineageOS API Level -->

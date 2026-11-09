@@ -14,10 +14,10 @@ that is now set.
  1 file changed, 3 insertions(+)
 
 diff --git a/config/common.mk b/config/common.mk
-index 9bb749e4..04533d44 100644
+index d1a2dbbf..f6d19335 100644
 --- a/config/common.mk
 +++ b/config/common.mk
-@@ -264,4 +264,7 @@ include vendor/lineage/config/version.mk
+@@ -306,4 +306,7 @@ include vendor/lineage/config/version.mk
  -include vendor/lineage-priv/keys/keys.mk
  
  -include $(WORKSPACE)/build_env/image-auto-bits.mk
