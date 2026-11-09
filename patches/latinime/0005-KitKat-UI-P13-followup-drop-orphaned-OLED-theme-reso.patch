@@ -1,0 +1,526 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Mon, 9 Nov 2026 10:59:35 -0600
+Subject: [PATCH 5/5] KitKat UI P13 followup: drop orphaned OLED theme
+ resources
+
+The KitKat UI P13 patch reassigned keyboardTheme/themeId enum value 7
+from OLED to KitKat and removed THEME_ID_OLED from KeyboardTheme, but
+left the OLED style/color/icon/drawable resources behind, so aapt2
+link failed with:
+
+  res/values/themes-oled.xml:25: error: expected enum but got (raw string) OLED.
+
+Delete the orphaned OLED resource set and fold the keyboardTheme case
+flag "ICS|KLP|You|OLED" (OLED used the ICS geometry) into
+"ICS|KLP|You|KitKat".
+
+Change-Id: I64d2d186488ac5190d102b1b2c778bd44ce15c3e
+---
+ .../btn_keyboard_key_action_normal_oled.xml   |   9 --
+ .../btn_keyboard_key_action_pressed_oled.xml  |   9 --
+ ...tn_keyboard_key_functional_normal_oled.xml |   9 --
+ .../btn_keyboard_key_functional_oled.xml      |  10 --
+ ...n_keyboard_key_functional_pressed_oled.xml |   9 --
+ .../drawable/btn_keyboard_key_normal_oled.xml |   9 --
+ java/res/drawable/btn_keyboard_key_oled.xml   |  33 ----
+ .../btn_keyboard_key_pressed_oled.xml         |   9 --
+ java/res/drawable/btn_suggestion_oled.xml     |  10 --
+ .../keyboard_key_feedback_background_oled.xml |  12 --
+ .../drawable/keyboard_key_feedback_oled.xml   |   8 -
+ java/res/values/colors-oled.xml               |  30 ----
+ java/res/values/keyboard-icons-oled.xml       |  31 ----
+ java/res/values/strings.xml                   |   1 -
+ java/res/values/themes-oled.xml               | 147 ------------------
+ java/res/xml-sw600dp/key_styles_enter.xml     |   2 +-
+ java/res/xml/key_styles_enter.xml             |   2 +-
+ java/res/xml/key_styles_number.xml            |   2 +-
+ 18 files changed, 3 insertions(+), 339 deletions(-)
+ delete mode 100644 java/res/drawable/btn_keyboard_key_action_normal_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_action_pressed_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_functional_normal_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_functional_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_functional_pressed_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_normal_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_oled.xml
+ delete mode 100644 java/res/drawable/btn_keyboard_key_pressed_oled.xml
+ delete mode 100644 java/res/drawable/btn_suggestion_oled.xml
+ delete mode 100644 java/res/drawable/keyboard_key_feedback_background_oled.xml
+ delete mode 100644 java/res/drawable/keyboard_key_feedback_oled.xml
+ delete mode 100644 java/res/values/colors-oled.xml
+ delete mode 100644 java/res/values/keyboard-icons-oled.xml
+ delete mode 100644 java/res/values/themes-oled.xml
+
+diff --git a/java/res/drawable/btn_keyboard_key_action_normal_oled.xml b/java/res/drawable/btn_keyboard_key_action_normal_oled.xml
+deleted file mode 100644
+index 481c793e2..000000000
+--- a/java/res/drawable/btn_keyboard_key_action_normal_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_action_background_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_keyboard_key_action_pressed_oled.xml b/java/res/drawable/btn_keyboard_key_action_pressed_oled.xml
+deleted file mode 100644
+index 59b609ebe..000000000
+--- a/java/res/drawable/btn_keyboard_key_action_pressed_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_action_background_pressed_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_keyboard_key_functional_normal_oled.xml b/java/res/drawable/btn_keyboard_key_functional_normal_oled.xml
+deleted file mode 100644
+index 4d05f8e2c..000000000
+--- a/java/res/drawable/btn_keyboard_key_functional_normal_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_functional_background_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_keyboard_key_functional_oled.xml b/java/res/drawable/btn_keyboard_key_functional_oled.xml
+deleted file mode 100644
+index 2cef542b5..000000000
+--- a/java/res/drawable/btn_keyboard_key_functional_oled.xml
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+-    <item android:state_pressed="true"
+-          android:drawable="@drawable/btn_keyboard_key_functional_pressed_oled" />
+-    <item android:drawable="@drawable/btn_keyboard_key_functional_normal_oled" />
+-</selector>
+diff --git a/java/res/drawable/btn_keyboard_key_functional_pressed_oled.xml b/java/res/drawable/btn_keyboard_key_functional_pressed_oled.xml
+deleted file mode 100644
+index d5513fa32..000000000
+--- a/java/res/drawable/btn_keyboard_key_functional_pressed_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_functional_background_pressed_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_keyboard_key_normal_oled.xml b/java/res/drawable/btn_keyboard_key_normal_oled.xml
+deleted file mode 100644
+index acd995787..000000000
+--- a/java/res/drawable/btn_keyboard_key_normal_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_background_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_keyboard_key_oled.xml b/java/res/drawable/btn_keyboard_key_oled.xml
+deleted file mode 100644
+index dfc547dd7..000000000
+--- a/java/res/drawable/btn_keyboard_key_oled.xml
++++ /dev/null
+@@ -1,33 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+-    <!-- Action keys. -->
+-    <item android:state_active="true" android:state_pressed="true"
+-          android:drawable="@drawable/btn_keyboard_key_action_pressed_oled" />
+-    <item android:state_active="true"
+-          android:drawable="@drawable/btn_keyboard_key_action_normal_oled" />
+-
+-    <!-- Toggle keys. Use checkable/checked state. -->
+-    <item android:state_checkable="true" android:state_checked="true" android:state_pressed="true"
+-          android:drawable="@drawable/btn_keyboard_key_functional_pressed_oled" />
+-    <item android:state_checkable="true" android:state_pressed="true"
+-          android:drawable="@drawable/btn_keyboard_key_functional_pressed_oled" />
+-    <item android:state_checkable="true" android:state_checked="true"
+-          android:drawable="@drawable/btn_keyboard_key_functional_pressed_oled" />
+-    <item android:state_checkable="true"
+-          android:drawable="@drawable/btn_keyboard_key_functional_normal_oled" />
+-
+-    <!-- Empty background keys. -->
+-    <item android:state_empty="true" android:state_pressed="true"
+-          android:drawable="@color/key_background_pressed_oled" />
+-    <item android:state_empty="true"
+-          android:drawable="@android:color/transparent" />
+-
+-    <!-- Normal keys. -->
+-    <item android:state_pressed="true"
+-          android:drawable="@drawable/btn_keyboard_key_pressed_oled" />
+-    <item android:drawable="@drawable/btn_keyboard_key_normal_oled" />
+-</selector>
+diff --git a/java/res/drawable/btn_keyboard_key_pressed_oled.xml b/java/res/drawable/btn_keyboard_key_pressed_oled.xml
+deleted file mode 100644
+index 8c58bb5b2..000000000
+--- a/java/res/drawable/btn_keyboard_key_pressed_oled.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_background_pressed_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-</shape>
+diff --git a/java/res/drawable/btn_suggestion_oled.xml b/java/res/drawable/btn_suggestion_oled.xml
+deleted file mode 100644
+index eee4f6b1a..000000000
+--- a/java/res/drawable/btn_suggestion_oled.xml
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+-    <item
+-        android:state_pressed="true"
+-        android:drawable="@color/suggested_word_background_selected_oled" />
+-</selector>
+diff --git a/java/res/drawable/keyboard_key_feedback_background_oled.xml b/java/res/drawable/keyboard_key_feedback_background_oled.xml
+deleted file mode 100644
+index bb120f551..000000000
+--- a/java/res/drawable/keyboard_key_feedback_background_oled.xml
++++ /dev/null
+@@ -1,12 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <solid android:color="@color/key_background_oled"/>
+-    <corners android:radius="@dimen/keyboard_key_corner_radius_you" />
+-    <size
+-        android:width="40dp"
+-        android:height="1dp" />
+-</shape>
+diff --git a/java/res/drawable/keyboard_key_feedback_oled.xml b/java/res/drawable/keyboard_key_feedback_oled.xml
+deleted file mode 100644
+index b0e3740ef..000000000
+--- a/java/res/drawable/keyboard_key_feedback_oled.xml
++++ /dev/null
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+-    <item android:drawable="@drawable/keyboard_key_feedback_background_oled" />
+-</selector>
+diff --git a/java/res/values/colors-oled.xml b/java/res/values/colors-oled.xml
+deleted file mode 100644
+index 9770a2fac..000000000
+--- a/java/res/values/colors-oled.xml
++++ /dev/null
+@@ -1,30 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<resources>
+-    <!-- Color resources for OLED theme (pure black background, dim grey keys) -->
+-    <color name="keyboard_background_oled">#000000</color>
+-    <color name="key_background_oled">#1A1A1A</color>
+-    <color name="key_background_pressed_oled">#333333</color>
+-    <color name="key_functional_background_oled">#222222</color>
+-    <color name="key_functional_background_pressed_oled">#3A3A3A</color>
+-    <color name="key_action_background_oled">#001D2B</color>
+-    <color name="key_action_background_pressed_oled">#002D40</color>
+-    <color name="icon_color_oled">#AAAAAA</color>
+-    <color name="key_text_color_oled">#AAAAAA</color>
+-    <color name="key_functional_text_color_oled">#AAAAAAAA</color>
+-    <color name="key_text_inactive_color_oled">#80AAAAAA</color>
+-    <color name="key_hint_letter_color_oled">#80AAAAAA</color>
+-    <color name="highlight_color_oled">#005851</color>
+-    <color name="auto_correct_color_oled">#AAAAAA</color>
+-    <color name="typed_word_color_oled">#D9AAAAAA</color>
+-    <color name="suggested_word_color_oled">#B3AAAAAA</color>
+-    <color name="gesture_trail_color_oled">#005851</color>
+-    <color name="sliding_key_input_preview_color_oled">#B3005851</color>
+-    <color name="gesture_floating_preview_color_oled">#E6222222</color>
+-    <color name="gesture_floating_preview_text_color_oled">#AAAAAA</color>
+-    <color name="emoji_tab_page_indicator_background_oled">#111111</color>
+-    <color name="suggested_word_background_selected_oled">#22AAAAAA</color>
+-</resources>
+diff --git a/java/res/values/keyboard-icons-oled.xml b/java/res/values/keyboard-icons-oled.xml
+deleted file mode 100644
+index 4414be894..000000000
+--- a/java/res/values/keyboard-icons-oled.xml
++++ /dev/null
+@@ -1,31 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+-    <style name="KeyboardIcons.OLED">
+-        <item name="iconShiftKey">@drawable/sym_keyboard_shift</item>
+-        <item name="iconDeleteKey">@drawable/sym_keyboard_delete</item>
+-        <item name="iconSettingsKey">@drawable/sym_keyboard_settings</item>
+-        <item name="iconSpaceKey">@null</item>
+-        <item name="iconEnterKey">@drawable/sym_keyboard_return</item>
+-        <item name="iconGoKey">@drawable/sym_keyboard_next</item>
+-        <item name="iconSearchKey">@drawable/sym_keyboard_search</item>
+-        <item name="iconSendKey">@drawable/sym_keyboard_send</item>
+-        <item name="iconNextKey">@drawable/sym_keyboard_next</item>
+-        <item name="iconDoneKey">@drawable/sym_keyboard_done</item>
+-        <item name="iconPreviousKey">@drawable/sym_keyboard_previous</item>
+-        <item name="iconTabKey">@drawable/sym_keyboard_tab</item>
+-        <item name="iconShortcutKey">@drawable/sym_keyboard_voice</item>
+-        <item name="iconSpaceKeyForNumberLayout">@drawable/sym_keyboard_space</item>
+-        <item name="iconShiftKeyShifted">@drawable/sym_keyboard_shift_locked</item>
+-        <item name="iconShortcutKeyDisabled">@drawable/sym_keyboard_voice_off</item>
+-        <item name="iconLanguageSwitchKey">@drawable/sym_keyboard_language_switch</item>
+-        <item name="iconZwnjKey">@drawable/sym_keyboard_zwnj_lxx_dark</item>
+-        <item name="iconZwjKey">@drawable/sym_keyboard_zwj_lxx_dark</item>
+-        <item name="iconEmojiActionKey">@drawable/sym_keyboard_smiley</item>
+-        <item name="iconEmojiNormalKey">@drawable/sym_keyboard_smiley</item>
+-        <item name="iconClipboardPasteKey">@drawable/sym_keyboard_clipboard_paste</item>
+-    </style>
+-</resources>
+diff --git a/java/res/values/strings.xml b/java/res/values/strings.xml
+index 24a9c8066..370ee27f9 100644
+--- a/java/res/values/strings.xml
++++ b/java/res/values/strings.xml
+@@ -359,7 +359,6 @@ mobile devices. [CHAR LIMIT=25] -->
+     <string name="keyboard_theme_material_light" translatable="false">Material Light</string>
+     <!-- The keyboard theme name, Material You. This is marked as translatable="false" because this is a proper name of system-wide UI Theme. -->
+     <string name="keyboard_theme_material_you" translatable="false">Material You</string>
+-    <string name="keyboard_theme_oled" translatable="false">OLED</string>
+ 
+     <!-- Title of the preference settings for custom input styles (language and keyboard layout pairs) [CHAR LIMIT=35]-->
+     <string name="custom_input_styles_title">Custom input styles</string>
+diff --git a/java/res/values/themes-oled.xml b/java/res/values/themes-oled.xml
+deleted file mode 100644
+index 829cc8c05..000000000
+--- a/java/res/values/themes-oled.xml
++++ /dev/null
+@@ -1,147 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-    SPDX-FileCopyrightText: The LineageOS Project
+-    SPDX-License-Identifier: Apache-2.0
+--->
+-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+-    <style name="KeyboardTheme.OLED" parent="KeyboardIcons.OLED">
+-        <item name="keyIconTint">@color/icon_color_oled</item>
+-        <item name="inputViewStyle">@style/InputView.LXX</item>
+-        <item name="keyboardStyle">@style/Keyboard.OLED</item>
+-        <item name="keyboardViewStyle">@style/KeyboardView.OLED</item>
+-        <item name="mainKeyboardViewStyle">@style/MainKeyboardView.OLED</item>
+-        <item name="emojiPalettesViewStyle">@style/EmojiPalettesView.OLED</item>
+-        <item name="moreKeysKeyboardStyle">@style/MoreKeysKeyboard.OLED</item>
+-        <item name="moreKeysKeyboardViewStyle">@style/MoreKeysKeyboardView.OLED</item>
+-        <item name="moreKeysKeyboardViewForActionStyle">@style/MoreKeysKeyboardView.OLED.Action</item>
+-        <item name="suggestionStripViewStyle">@style/SuggestionStripView.OLED</item>
+-        <item name="suggestionWordStyle">@style/SuggestionWord.OLED</item>
+-    </style>
+-    <style
+-        name="Keyboard.OLED"
+-        parent="Keyboard"
+-    >
+-        <!-- This should be aligned with KeyboardTheme.THEME_ID_* -->
+-        <item name="themeId">OLED</item>
+-        <item name="verticalGap">@fraction/config_key_vertical_gap_you</item>
+-    </style>
+-    <style
+-        name="KeyboardView.OLED"
+-        parent="KeyboardView.You_Common"
+-    >
+-        <item name="android:background">@color/keyboard_background_oled</item>
+-        <item name="keyBackground">@drawable/btn_keyboard_key_oled</item>
+-        <item name="functionalKeyBackground">@drawable/btn_keyboard_key_functional_oled</item>
+-        <item name="spacebarBackground">@drawable/btn_keyboard_key_functional_oled</item>
+-        <item name="keyTextColor">@color/key_text_color_oled</item>
+-        <item name="keyTextInactivatedColor">@color/key_text_inactive_color_oled</item>
+-        <item name="functionalTextColor">@color/key_functional_text_color_oled</item>
+-        <item name="keyHintLetterColor">@color/key_hint_letter_color_oled</item>
+-        <item name="keyHintLabelColor">@color/key_hint_letter_color_oled</item>
+-        <item name="keyShiftedLetterHintInactivatedColor">@color/key_text_inactive_color_oled</item>
+-        <item name="keyShiftedLetterHintActivatedColor">@color/key_text_color_oled</item>
+-        <item name="keyPreviewTextColor">@color/key_text_color_oled</item>
+-        <item name="gestureFloatingPreviewRoundRadius">@dimen/config_gesture_floating_preview_round_radius_you</item>
+-    </style>
+-    <style
+-        name="MainKeyboardView.OLED"
+-        parent="KeyboardView.OLED"
+-    >
+-        <item name="moreKeysKeyboardForActionLayout">@layout/more_keys_keyboard_for_action_lxx</item>
+-        <item name="keyPreviewBackground">@drawable/keyboard_key_feedback_oled</item>
+-        <item name="keyPreviewHeight">@dimen/config_key_preview_height_you</item>
+-        <item name="keyPreviewOffset">@dimen/config_key_preview_offset_you</item>
+-        <item name="keyPreviewShowUpAnimator">@anim/key_preview_show_up_lxx</item>
+-        <item name="keyPreviewDismissAnimator">@anim/key_preview_dismiss_lxx</item>
+-        <item name="gestureFloatingPreviewTextColor">@color/gesture_floating_preview_text_color_oled</item>
+-        <item name="gestureFloatingPreviewColor">@color/gesture_floating_preview_color_oled</item>
+-        <item name="gestureTrailColor">@color/gesture_trail_color_oled</item>
+-        <item name="slidingKeyInputPreviewColor">@color/sliding_key_input_preview_color_oled</item>
+-        <item name="languageOnSpacebarTextColor">@color/key_text_inactive_color_oled</item>
+-        <!-- A negative value to disable text shadow layer. -->
+-        <item name="languageOnSpacebarTextShadowRadius">-1.0</item>
+-    </style>
+-    <!-- Though {@link com.android.inputmethod.keyboard.emoji.EmojiPalettesView} doesn't extend
+-         {@link com.android.inputmethod.keyboard.KeyboardView}, some views inside it, for instance
+-         delete button, need themed {@link com.android.inputmethod.keyboard.KeyboardView}
+-         attributes. -->
+-    <style
+-        name="EmojiPalettesView.OLED"
+-        parent="MainKeyboardView.OLED"
+-    >
+-        <item name="categoryIndicatorEnabled">false</item>
+-        <item name="categoryPageIndicatorColor">@color/highlight_color_oled</item>
+-        <item name="categoryPageIndicatorBackground">@color/emoji_tab_page_indicator_background_oled</item>
+-        <item name="iconEmojiRecentsTab">@drawable/ic_emoji_recents_lxx_dark</item>
+-        <item name="iconEmojiCategory1Tab">@drawable/ic_emoji_people_lxx_dark</item>
+-        <item name="iconEmojiCategory2Tab">@drawable/ic_emoji_objects_lxx_dark</item>
+-        <item name="iconEmojiCategory3Tab">@drawable/ic_emoji_nature_lxx_dark</item>
+-        <item name="iconEmojiCategory4Tab">@drawable/ic_emoji_places_lxx_dark</item>
+-        <item name="iconEmojiCategory5Tab">@drawable/ic_emoji_symbols_lxx_dark</item>
+-        <item name="iconEmojiCategory6Tab">@drawable/ic_emoji_emoticons_lxx_dark</item>
+-        <item name="iconEmojiCategory7Tab">@drawable/ic_emoji_flag_lxx_dark</item>
+-        <item name="iconEmojiCategory8Tab">@drawable/ic_emoji_people_lxx_dark</item>
+-        <item name="iconEmojiCategory9Tab">@drawable/ic_emoji_nature_lxx_dark</item>
+-        <item name="iconEmojiCategory10Tab">@drawable/ic_emoji_food_lxx_dark</item>
+-        <item name="iconEmojiCategory11Tab">@drawable/ic_emoji_places_lxx_dark</item>
+-        <item name="iconEmojiCategory12Tab">@drawable/ic_emoji_activity_lxx_dark</item>
+-        <item name="iconEmojiCategory13Tab">@drawable/ic_emoji_objects_lxx_dark</item>
+-        <item name="iconEmojiCategory14Tab">@drawable/ic_emoji_symbols_lxx_dark</item>
+-        <item name="iconEmojiCategory15Tab">@drawable/ic_emoji_flag_lxx_dark</item>
+-        <item name="iconEmojiCategory16Tab">@drawable/ic_emoji_people_lxx_dark</item>
+-    </style>
+-    <style
+-        name="MoreKeysKeyboard.OLED"
+-        parent="Keyboard.OLED"
+-    >
+-        <item name="keyboardTopPadding">0%p</item>
+-        <item name="keyboardBottomPadding">0%p</item>
+-        <item name="keyboardLeftPadding">0%p</item>
+-        <item name="keyboardRightPadding">0%p</item>
+-        <item name="horizontalGap">0%p</item>
+-        <item name="touchPositionCorrectionData">@null</item>
+-    </style>
+-    <style
+-        name="MoreKeysKeyboardView.OLED"
+-        parent="KeyboardView.OLED"
+-    >
+-        <item name="android:background">@drawable/btn_keyboard_key_oled</item>
+-        <item name="keyBackground">@drawable/btn_keyboard_key_oled</item>
+-        <item name="divider">@drawable/more_keys_divider</item>
+-        <item name="keyTypeface">normal</item>
+-        <item name="verticalCorrection">@dimen/config_more_keys_keyboard_vertical_correction_holo</item>
+-    </style>
+-    <style
+-        name="MoreKeysKeyboardView.OLED.Action"
+-        parent="MoreKeysKeyboardView.OLED"
+-    >
+-        <item name="android:background">@android:color/transparent</item>
+-        <item name="keyBackground">@drawable/btn_keyboard_key_popup_action_you</item>
+-        <item name="divider">@null</item>
+-        <item name="keyLabelFlags">keepBackgroundAspectRatio</item>
+-    </style>
+-    <style
+-        name="SuggestionStripView.OLED"
+-        parent="KeyboardView.OLED"
+-    >
+-        <item name="suggestionsCountInStrip">@integer/config_suggestions_count_in_strip</item>
+-        <item name="centerSuggestionPercentile">@fraction/config_center_suggestion_percentile</item>
+-        <item name="maxMoreSuggestionsRow">@integer/config_max_more_suggestions_row</item>
+-        <item name="minMoreSuggestionsWidth">@fraction/config_min_more_suggestions_width</item>
+-        <item name="android:background">@color/keyboard_background_oled</item>
+-        <item name="android:src">@drawable/suggestions_strip_divider_lxx_dark</item>
+-        <item name="suggestionStripOptions">autoCorrectBold|validTypedWordBold</item>
+-        <item name="colorValidTypedWord">@color/typed_word_color_oled</item>
+-        <item name="colorTypedWord">@color/typed_word_color_oled</item>
+-        <item name="colorAutoCorrect">@color/auto_correct_color_oled</item>
+-        <item name="colorSuggested">@color/suggested_word_color_oled</item>
+-        <item name="alphaObsoleted">70%</item>
+-    </style>
+-    <style
+-        name="SuggestionWord.OLED"
+-        parent="SuggestionWord"
+-    >
+-        <item name="android:background">@drawable/btn_suggestion_oled</item>
+-        <item name="android:textColor">@color/highlight_color_oled</item>
+-    </style>
+-</resources>
+diff --git a/java/res/xml-sw600dp/key_styles_enter.xml b/java/res/xml-sw600dp/key_styles_enter.xml
+index 78dafdaf8..688a59b99 100644
+--- a/java/res/xml-sw600dp/key_styles_enter.xml
++++ b/java/res/xml-sw600dp/key_styles_enter.xml
+@@ -81,7 +81,7 @@
+     </switch>
+     <!-- Enter key style -->
+     <switch>
+-        <case latin:keyboardTheme="ICS|KLP|You|OLED">
++        <case latin:keyboardTheme="ICS|KLP|You|KitKat">
+             <key-style
+                 latin:styleName="defaultEnterKeyStyle"
+                 latin:keySpec="!icon/enter_key|!code/key_enter"
+diff --git a/java/res/xml/key_styles_enter.xml b/java/res/xml/key_styles_enter.xml
+index ebf987be2..6a157e3c5 100644
+--- a/java/res/xml/key_styles_enter.xml
++++ b/java/res/xml/key_styles_enter.xml
+@@ -213,7 +213,7 @@
+     </switch>
+     <!-- Enter key style -->
+     <switch>
+-        <case latin:keyboardTheme="ICS|KLP|You|OLED">
++        <case latin:keyboardTheme="ICS|KLP|You|KitKat">
+             <key-style
+                 latin:styleName="defaultEnterKeyStyle"
+                 latin:keySpec="!icon/enter_key|!code/key_enter"
+diff --git a/java/res/xml/key_styles_number.xml b/java/res/xml/key_styles_number.xml
+index 8950d410d..262f9b556 100644
+--- a/java/res/xml/key_styles_number.xml
++++ b/java/res/xml/key_styles_number.xml
+@@ -108,7 +108,7 @@
+     <!-- TODO: Consolidate these space key styles with numSpaceKeyStyle above by introducing <case>
+          predicator that checks device form-factor. -->
+     <switch>
+-        <case latin:keyboardTheme="ICS|KLP|You|OLED">
++        <case latin:keyboardTheme="ICS|KLP|You|KitKat">
+             <key-style
+                 latin:styleName="tabletNumSpaceKeyStyle"
+                 latin:keySpec="!icon/space_key|!code/key_space"
+-- 
+2.53.0
+

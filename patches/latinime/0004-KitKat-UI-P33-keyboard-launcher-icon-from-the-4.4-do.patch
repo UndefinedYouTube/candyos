@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 29 Oct 2026 13:57:00 -0500
-Subject: [PATCH 4/4] KitKat UI P33: keyboard launcher icon from the 4.4 donor
+Subject: [PATCH 4/5] KitKat UI P33: keyboard launcher icon from the 4.4 donor
  (P33.1)
 
 The authentic android-4.4.4_r1 LatinIME keyboard icon (latinime-4.4 donor mipmap set, vendored in the CandyOS repo at reference/donor-icons/latinime), byte-identical at the donor densities (mdpi..xxhdpi - the donor has no xxxhdpi). Replaces the adaptive mipmap-anydpi-v26/ic_launcher.xml plus its background/foreground drawables with legacy full-bleed PNGs.
