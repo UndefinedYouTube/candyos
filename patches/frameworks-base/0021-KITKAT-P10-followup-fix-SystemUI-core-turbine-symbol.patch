@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Mon, 9 Nov 2026 11:40:51 -0600
+Subject: [PATCH 21/21] KITKAT: P10 followup: fix SystemUI-core turbine symbol
+ errors
+
+- KitKatRecentsImpl: com.android.wm.shell.util.GroupedRecentTaskInfo
+  does not exist in this tree - the shell recents callback delivers
+  com.android.wm.shell.shared.GroupedTaskInfo, whose getTaskInfoList()
+  returns the generic List<TaskInfo>. Filter to RecentTaskInfo (a
+  TaskInfo subclass) when assembling the activity's task list.
+- HomeStatusBarModule: com.android.systemui.statusbar.core.CentralSurfaces
+  does not exist here; createTicker lives on CentralSurfacesImpl
+  (statusbar.phone). Inject CentralSurfacesImpl (its constructor is
+  @Inject-annotated) in provideTicker.
+
+Change-Id: Ib89682bf3d10111781a2a3a0a75e4f069dbfd308
+---
+ .../systemui/recents/KitKatRecentsImpl.java      | 16 +++++++++++-----
+ .../fragment/dagger/HomeStatusBarModule.java     |  6 +++---
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
+index 73200beddbe6..de49a4250d80 100644
+--- a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
+@@ -26,7 +26,7 @@ import com.android.systemui.dagger.qualifiers.Main;
+ import com.android.systemui.plugins.ActivityStarter;
+ import com.android.systemui.statusbar.policy.KeyguardStateController;
+ import com.android.wm.shell.recents.RecentTasks;
+-import com.android.wm.shell.util.GroupedRecentTaskInfo;
++import com.android.wm.shell.shared.GroupedTaskInfo;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -106,11 +106,17 @@ public class KitKatRecentsImpl implements RecentsImplementation {
+         }
+     }
+ 
+-    private void startRecentsActivity(List<GroupedRecentTaskInfo> groupedTasks) {
++    private void startRecentsActivity(List<GroupedTaskInfo> groupedTasks) {
+         ArrayList<ActivityManager.RecentTaskInfo> tasks = new ArrayList<>();
+-        for (GroupedRecentTaskInfo group : groupedTasks) {
+-            // Split-screen pairs are listed as their own cards.
+-            tasks.addAll(group.getTaskInfoList());
++        for (GroupedTaskInfo group : groupedTasks) {
++            // Split-screen pairs are listed as their own cards. The shell
++            // hands us the generic TaskInfo list; recents entries are
++            // RecentTaskInfo (a TaskInfo subclass) - skip anything else.
++            for (ActivityManager.TaskInfo taskInfo : group.getTaskInfoList()) {
++                if (taskInfo instanceof ActivityManager.RecentTaskInfo) {
++                    tasks.add((ActivityManager.RecentTaskInfo) taskInfo);
++                }
++            }
+         }
+         Intent intent = new Intent(mContext, KitKatRecentsActivity.class)
+                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
+index e597038e0a45..cc45db924c80 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/dagger/HomeStatusBarModule.java
+@@ -21,7 +21,7 @@ import android.view.ViewStub;
+ 
+ import com.android.systemui.dagger.qualifiers.RootView;
+ import com.android.systemui.res.R;
+-import com.android.systemui.statusbar.core.CentralSurfaces;
++import com.android.systemui.statusbar.phone.CentralSurfacesImpl;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarTransitions;
+ import com.android.systemui.statusbar.phone.Ticker;
+ import com.android.systemui.statusbar.phone.PhoneStatusBarView;
+@@ -122,8 +122,8 @@ public interface HomeStatusBarModule {
+     @HomeStatusBarScope
+     static Ticker provideTicker(
+             @RootView PhoneStatusBarView phoneStatusBarView,
+-            CentralSurfaces centralSurfaces) {
+-        return centralSurfaces.createTicker(phoneStatusBarView);
++            CentralSurfacesImpl centralSurfacesImpl) {
++        return centralSurfacesImpl.createTicker(phoneStatusBarView);
+     }
+ 
+     /** */
+-- 
+2.53.0
+

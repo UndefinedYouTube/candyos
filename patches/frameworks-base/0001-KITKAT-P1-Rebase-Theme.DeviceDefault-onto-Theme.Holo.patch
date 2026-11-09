@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:07:26 -0600
-Subject: [PATCH 01/20] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
+Subject: [PATCH 01/21] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
 
 - 35 Material parents swapped for Holo across the DeviceDefault family
   (5 styles kept on Material for lack of Holo counterparts)

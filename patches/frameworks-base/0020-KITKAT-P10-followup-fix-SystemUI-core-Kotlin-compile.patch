@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Mon, 9 Nov 2026 11:13:17 -0600
-Subject: [PATCH 20/20] KITKAT: P10 followup: fix SystemUI-core Kotlin compile
+Subject: [PATCH 20/21] KITKAT: P10 followup: fix SystemUI-core Kotlin compile
  errors
 
 The P9/P10 completion sweep added the shade carrier label, drag handle,
