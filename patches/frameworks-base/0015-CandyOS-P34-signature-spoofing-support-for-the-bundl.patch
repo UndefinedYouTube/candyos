@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:20:49 -0600
-Subject: [PATCH 15/21] CandyOS P34: signature spoofing support for the bundled
+Subject: [PATCH 15/22] CandyOS P34: signature spoofing support for the bundled
  microG
 
 - new hidden android.permission.FAKE_PACKAGE_SIGNATURE permission

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:19:55 -0600
-Subject: [PATCH 14/21] CandyOS P28.6: QS footer actions flat donor strip
+Subject: [PATCH 14/22] CandyOS P28.6: QS footer actions flat donor strip
 
 The QS footer actions strip flattens to the P3 palette - flat #ff161616,
 square corners - so it reads seamless with the P24 flat shade panel

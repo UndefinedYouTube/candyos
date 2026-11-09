@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:19:11 -0600
-Subject: [PATCH 12/21] CandyOS P23 fix: gate the 4.4 ticker on the live power
+Subject: [PATCH 12/22] CandyOS P23 fix: gate the 4.4 ticker on the live power
  state
 
 Gate the ticker's device-interactive supplier on

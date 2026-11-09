@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:17:23 -0600
-Subject: [PATCH 10/21] KitKat UI P18: navbar + IME rotation, suppress shade
+Subject: [PATCH 10/22] KitKat UI P18: navbar + IME rotation, suppress shade
  footer actions
 
 - P18.4: qs_panel_padding_top 80dp -> 48dp (donor QS panel: brightness

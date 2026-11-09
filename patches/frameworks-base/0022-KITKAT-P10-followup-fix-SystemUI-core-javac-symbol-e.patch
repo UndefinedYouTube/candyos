@@ -1,0 +1,98 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Mon, 9 Nov 2026 12:15:47 -0600
+Subject: [PATCH 22/22] KITKAT: P10 followup: fix SystemUI-core javac symbol
+ errors
+
+- KitKatBrightnessTile / KitKatSettingsTile / KitKatUserTile: the
+  SystemUI R class lives in com.android.systemui.res (upstream moved
+  it out of com.android.systemui) - fix the imports.
+- KitKatRecentsActivity: ThumbnailData.thumbnail is a Kotlin val with
+  a getter (thumbnail.getThumbnail()) - no field access from Java.
+- KitKatRecentsImpl: ActivityManager.TaskInfo does not exist - TaskInfo
+  is a top-level android.app class and only RecentTaskInfo nests in
+  ActivityManager. Iterate getTaskInfoList() into a RecentTaskInfo[]
+  instead.
+
+Change-Id: Id1d1a180fb9eed6d99b802232d7efbccc8ba23d0
+---
+ .../android/systemui/qs/tiles/KitKatBrightnessTile.java    | 2 +-
+ .../com/android/systemui/qs/tiles/KitKatSettingsTile.java  | 2 +-
+ .../src/com/android/systemui/qs/tiles/KitKatUserTile.java  | 2 +-
+ .../android/systemui/recents/KitKatRecentsActivity.java    | 2 +-
+ .../com/android/systemui/recents/KitKatRecentsImpl.java    | 7 +++----
+ 5 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
+index ae375eb62e67..7c9bc2e6784d 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
+@@ -23,7 +23,7 @@ import com.android.systemui.qs.QSHost;
+ import com.android.systemui.qs.QsEventLogger;
+ import com.android.systemui.qs.logging.QSLogger;
+ import com.android.systemui.qs.tileimpl.QSTileImpl;
+-import com.android.systemui.R;
++import com.android.systemui.res.R;
+ 
+ /**
+  * KitKat UI Project (P20.8): donor 4.4 brightness TILE. The 4.4 phone QS
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
+index 40d4ffc5cf90..787d6fa8345d 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
+@@ -20,7 +20,7 @@ import com.android.systemui.qs.QSHost;
+ import com.android.systemui.qs.QsEventLogger;
+ import com.android.systemui.qs.logging.QSLogger;
+ import com.android.systemui.qs.tileimpl.QSTileImpl;
+-import com.android.systemui.R;
++import com.android.systemui.res.R;
+ 
+ import javax.inject.Inject;
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
+index 4dfb31e0d045..8d7131394e0f 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
+@@ -23,7 +23,7 @@ import com.android.systemui.qs.QSHost;
+ import com.android.systemui.qs.QsEventLogger;
+ import com.android.systemui.qs.logging.QSLogger;
+ import com.android.systemui.qs.tileimpl.QSTileImpl;
+-import com.android.systemui.R;
++import com.android.systemui.res.R;
+ 
+ import javax.inject.Inject;
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java
+index 275e4fd726a9..a5fc9d6fad33 100644
+--- a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java
++++ b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsActivity.java
+@@ -174,7 +174,7 @@ public class KitKatRecentsActivity extends Activity {
+         snapshot.setScaleType(ImageView.ScaleType.CENTER_CROP);
+         ThumbnailData thumbnail = ActivityManagerWrapper.getInstance()
+                 .getTaskThumbnail(task.taskId, true /* isLowResolution */);
+-        Bitmap bitmap = thumbnail != null ? thumbnail.thumbnail : null;
++        Bitmap bitmap = thumbnail != null ? thumbnail.getThumbnail() : null;
+         if (bitmap != null) {
+             snapshot.setImageBitmap(bitmap);
+         } else {
+diff --git a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
+index de49a4250d80..b39c764c0865 100644
+--- a/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/recents/KitKatRecentsImpl.java
+@@ -112,10 +112,9 @@ public class KitKatRecentsImpl implements RecentsImplementation {
+             // Split-screen pairs are listed as their own cards. The shell
+             // hands us the generic TaskInfo list; recents entries are
+             // RecentTaskInfo (a TaskInfo subclass) - skip anything else.
+-            for (ActivityManager.TaskInfo taskInfo : group.getTaskInfoList()) {
+-                if (taskInfo instanceof ActivityManager.RecentTaskInfo) {
+-                    tasks.add((ActivityManager.RecentTaskInfo) taskInfo);
+-                }
++            for (ActivityManager.RecentTaskInfo taskInfo :
++                    group.getTaskInfoList().toArray(new ActivityManager.RecentTaskInfo[0])) {
++                tasks.add(taskInfo);
+             }
+         }
+         Intent intent = new Intent(mContext, KitKatRecentsActivity.class)
+-- 
+2.53.0
+
