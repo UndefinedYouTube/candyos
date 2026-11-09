@@ -44,7 +44,6 @@ android_app_import {
         "Home",
         "Launcher2",
         "Launcher3",
-        "Launcher3QuickStep",
         "QuickSearchBox",
     ],
 }
