@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Mon, 9 Nov 2026 11:13:17 -0600
+Subject: [PATCH 20/20] KITKAT: P10 followup: fix SystemUI-core Kotlin compile
+ errors
+
+The P9/P10 completion sweep added the shade carrier label, drag handle,
+QS header avatar/settings/clear-all wiring and the opaque status bar
+default, but referenced classes without importing them and used a
+StatusBarMode value that does not exist:
+
+- NotificationsQSContainerController: import CarrierTextManager
+  (com.android.keyguard), StatusBarStateController
+  (com.android.systemui.plugins.statusbar), StatusBarState and
+  ShadeCarrierTextController - kotlinc failed with 'unresolved
+  reference' on every use
+- ShadeHeaderController: import android.widget.ImageButton/ImageView
+  for the settings button, clear-all button and user avatar
+- StatusBarModePerDisplayRepository: the default status bar mode was
+  spelled StatusBarMode.OPAQUE, which is not a member of the enum
+  (unresolved reference). Use OPAQUE_DARK instead: it is the exact
+  4.4 opaque-black bar (BarTransitions.MODE_OPAQUE, renamed
+  MODE_OPAQUE_DARK upstream), so no new enum value is needed.
+
+Change-Id: I6a3746b6161233725a883927fb13c90da2261466
+---
+ .../shade/NotificationsQSContainerController.kt    |  4 ++++
+ .../systemui/shade/ShadeHeaderController.kt        |  2 ++
+ .../StatusBarModePerDisplayRepository.kt           | 14 +++++++-------
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
+index d39c9d7bb816..12e0b263f517 100644
+--- a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
++++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
+@@ -28,6 +28,7 @@ import androidx.constraintlayout.widget.ConstraintSet.START
+ import androidx.constraintlayout.widget.ConstraintSet.TOP
+ import androidx.lifecycle.lifecycleScope
+ import com.android.app.tracing.coroutines.launchTraced as launch
++import com.android.keyguard.CarrierTextManager
+ import com.android.systemui.LauncherProxyService
+ import com.android.systemui.LauncherProxyService.LauncherProxyListener
+ import com.android.systemui.dagger.SysUISingleton
+@@ -38,12 +39,15 @@ import com.android.systemui.lifecycle.repeatWhenAttached
+ import com.android.systemui.navigationbar.NavigationModeController
+ import com.android.systemui.plugins.qs.QS
+ import com.android.systemui.plugins.qs.QSContainerController
++import com.android.systemui.plugins.statusbar.StatusBarStateController
+ import com.android.systemui.res.R
+ import com.android.systemui.scene.shared.flag.SceneContainerFlag
++import com.android.systemui.shade.carrier.ShadeCarrierTextController
+ import com.android.systemui.shade.domain.interactor.ShadeInteractor
+ import com.android.systemui.shade.domain.interactor.ShadeModeInteractor
+ import com.android.systemui.shade.shared.model.ShadeMode
+ import com.android.systemui.shared.system.QuickStepContract
++import com.android.systemui.statusbar.StatusBarState
+ import com.android.systemui.statusbar.notification.stack.NotificationStackScrollLayoutController
+ import com.android.systemui.statusbar.policy.SplitShadeStateController
+ import com.android.systemui.util.LargeScreenUtils
+diff --git a/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt b/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
+index fc7ead48a260..d1041e314bb9 100644
+--- a/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
++++ b/packages/SystemUI/src/com/android/systemui/shade/ShadeHeaderController.kt
+@@ -35,6 +35,8 @@ import android.view.DisplayCutout
+ import android.view.View
+ import android.view.ViewGroup
+ import android.view.WindowInsets
++import android.widget.ImageButton
++import android.widget.ImageView
+ import android.widget.TextView
+ import androidx.annotation.VisibleForTesting
+ import androidx.compose.foundation.isSystemInDarkTheme
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt b/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
+index 3e8239d63084..b2d456816540 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/data/repository/StatusBarModePerDisplayRepository.kt
+@@ -394,13 +394,13 @@ constructor(
+             this and APPEARANCE_OPAQUE_STATUS_BARS != 0 -> StatusBarMode.OPAQUE_DARK
+             this and APPEARANCE_SEMI_TRANSPARENT_STATUS_BARS != 0 -> StatusBarMode.SEMI_TRANSPARENT
+             // KitKat UI Project: 4.4 defaulted the status bar to opaque black
+-            // (BarTransitions.MODE_OPAQUE, #ff000000); the edge-to-edge
+-            // transparent bar is a modern default. Apps that explicitly request
+-            // semi-transparent bars keep that behavior. Keyguard/AOD are
+-            // unaffected: this mode drives only the status bar window's
+-            // background view, which the fullscreen shade window covers
+-            // whenever the keyguard is showing.
+-            else -> StatusBarMode.OPAQUE
++            // (BarTransitions.MODE_OPAQUE, #ff000000; MODE_OPAQUE_DARK after
++            // the upstream rename); the edge-to-edge transparent bar is a
++            // modern default. Apps that explicitly request semi-transparent
++            // bars keep that behavior. Keyguard/AOD are unaffected: this mode
++            // drives only the status bar window's background view, which the
++            // fullscreen shade window covers whenever the keyguard is showing.
++            else -> StatusBarMode.OPAQUE_DARK
+         }
+     }
+ 
+-- 
+2.53.0
+

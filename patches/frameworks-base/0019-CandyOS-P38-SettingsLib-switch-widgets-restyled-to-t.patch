@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 5 Nov 2026 13:52:08 -0600
-Subject: [PATCH 19/19] CandyOS P38: SettingsLib switch widgets restyled to the
+Subject: [PATCH 19/20] CandyOS P38: SettingsLib switch widgets restyled to the
  4.4 Holo switch
 
 Switch.SettingsLib, SwitchCompat.SettingsLib and

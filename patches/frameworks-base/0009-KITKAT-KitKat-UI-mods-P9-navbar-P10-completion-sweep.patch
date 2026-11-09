@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:16:53 -0600
-Subject: [PATCH 09/19] KITKAT: KitKat UI mods - P9 navbar, P10 completion
+Subject: [PATCH 09/20] KITKAT: KitKat UI mods - P9 navbar, P10 completion
  sweep (round 3)
 
 Styles follow-up from the P9/P10 completion sweep (ported to the

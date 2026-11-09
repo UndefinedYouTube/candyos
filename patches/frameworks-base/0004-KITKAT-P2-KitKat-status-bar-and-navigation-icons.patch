@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Sun, 8 Nov 2026 16:07:58 -0600
-Subject: [PATCH 04/19] KITKAT-P2: KitKat status bar and navigation icons
+Subject: [PATCH 04/20] KITKAT-P2: KitKat status bar and navigation icons
 
 - Status bar clock defaults to the right side (ClockController)
 - Navbar glyphs rewritten as white outlined triangle/circle/square
