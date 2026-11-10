@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Maya <maya@example.com>
+Date: Tue, 10 Nov 2026 10:00:00 -0000
+Subject: [PATCH 23/23] KitKat status bar translucent shadow scrim
+
+Apply KitKat status bar translucent shadow scrim exclusively on the home screen.
+
+---
+ .../res/drawable/status_bar_kitkat_scrim.xml   | 28 +++++++++++++++++++
+ .../phone/PhoneStatusBarTransitions.java       |  5 +++-
+ .../com/android/server/wm/DisplayPolicy.java   |  6 +++++
+ 3 files changed, 38 insertions(+), 1 deletion(-)
+ create mode 100644 packages/SystemUI/res/drawable/status_bar_kitkat_scrim.xml
+
+diff --git a/packages/SystemUI/res/drawable/status_bar_kitkat_scrim.xml b/packages/SystemUI/res/drawable/status_bar_kitkat_scrim.xml
+new file mode 100644
+index 000000000000..f00000000000
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/status_bar_kitkat_scrim.xml
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++  ~ KitKat status bar shadow scrim: a dark gradient rising from the top
++  ~ of the screen to transparent.
++  -->
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++       android:shape="rectangle">
++    <gradient
++        android:angle="270"
++        android:startColor="#66000000"
++        android:endColor="#00000000"
++        />
++</shape>
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarTransitions.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarTransitions.java
+index 1234567890ab..9876543210ba 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarTransitions.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarTransitions.java
+@@ -25,7 +25,10 @@ public class PhoneStatusBarTransitions extends BarTransitions {
+     private final float mSemiTransparentAlpha;
+
+     public PhoneStatusBarTransitions(PhoneStatusBarView view) {
+-        super(view, R.drawable.status_bar_background);
++        super(view, R.drawable.status_bar_kitkat_scrim);
++        // Enable gradient scrim support for the status bar
++        setGradientScrimEnabled(true);
++
+         mView = view;
+         mSemiTransparentAlpha = view.getContext().getResources().getFraction(
+                 R.dimen.status_bar_translucent_alpha, 1, 0);
+diff --git a/services/core/java/com/android/server/wm/DisplayPolicy.java b/services/core/java/com/android/server/wm/DisplayPolicy.java
+index 1234567890ab..9876543210ba 100644
+--- a/services/core/java/com/android/server/wm/DisplayPolicy.java
++++ b/services/core/java/com/android/server/wm/DisplayPolicy.java
+@@ -1025,6 +1025,12 @@ public class DisplayPolicy {
+      * are modified in-place.
+      */
+     public void adjustWindowParamsLw(WindowState win, WindowManager.LayoutParams attrs) {
++        // Force translucent status bar only on the home screen
++        if (win.getActivityType() == ACTIVITY_TYPE_HOME) {
++            attrs.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
++        }
++
+         switch (attrs.type) {
+             case TYPE_SYSTEM_OVERLAY:
+             case TYPE_SECURE_SYSTEM_OVERLAY:
+--
+2.53.0
